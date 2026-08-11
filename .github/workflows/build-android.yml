@@ -1,0 +1,99 @@
+name: Build Android APK
+
+# Runs automatically every time you push code to the "main" branch.
+# You can also trigger it manually from the GitHub Actions tab (workflow_dispatch).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up Java (needed by Gradle/Android build)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Remove any existing android directory
+        run: rm -rf android
+
+      - name: Add Capacitor Android platform
+        run: npx cap add android
+
+      - name: Generate app icon + splash (if resources/ present)
+        # @capacitor/assets is not in package.json (sharp breaks on Termux).
+        # Skip gracefully if resources/ is missing so the build still succeeds.
+        run: |
+          if [ -d resources ]; then
+            npx --yes @capacitor/assets generate --android || true
+          else
+            echo "No resources/ folder — using default Capacitor icons"
+          fi
+
+      - name: Sync Capacitor (copies www/ into the native Android project)
+        run: npx cap sync android
+
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK as a downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: skonga-ai-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      # ── SIGNED RELEASE BUILD (optional) ───────────────────────────
+      # Add these 4 secrets in repo Settings ▸ Secrets ▸ Actions:
+      #   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
+      #   ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+      - name: Check for release signing secrets
+        id: has-signing
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Decode release keystore
+        if: steps.has-signing.outputs.present == 'true'
+        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+
+      - name: Build signed release APK
+        if: steps.has-signing.outputs.present == 'true'
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=release.keystore \
+            -Pandroid.injected.signing.store.password="$ANDROID_KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$ANDROID_KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$ANDROID_KEY_PASSWORD"
+
+      - name: Upload signed release APK
+        if: steps.has-signing.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: skonga-ai-release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
