@@ -1,0 +1,11 @@
+{
+  "appId": "tz.co.kclplatform.skonga",
+  "appName": "SKONGA AI",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}
