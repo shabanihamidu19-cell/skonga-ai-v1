@@ -1,0 +1,19 @@
+{
+  "name": "skonga-app",
+  "version": "1.0.0",
+  "description": "SKONGA AI - native Android app shell (Capacitor)",
+  "scripts": {
+    "sync": "npx cap sync android"
+  },
+  "dependencies": {
+    "@capacitor-community/speech-recognition": "^6.0.1",
+    "@capacitor/android": "^6.2.1",
+    "@capacitor/camera": "^6.0.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/local-notifications": "^6.1.0",
+    "@capacitor/push-notifications": "^6.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
