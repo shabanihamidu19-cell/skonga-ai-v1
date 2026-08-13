@@ -145,6 +145,11 @@ header{height:var(--hdr-h);display:flex;align-items:center;justify-content:space
 .chat-hist-list{flex:1;overflow-y:auto;padding:4px 8px 16px}
 .chat-hist-list::-webkit-scrollbar{width:2px}
 .chat-hist-list::-webkit-scrollbar-thumb{background:var(--purple-mid)}
+.sidebar-upgrade{flex-shrink:0;margin:8px 10px 14px;padding:14px;border-radius:14px;background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(192,132,252,.08));border:1px solid rgba(168,85,247,.35)}
+.sidebar-upgrade-title{font-size:.88rem;font-weight:600;color:var(--purple-light);margin-bottom:6px}
+.sidebar-upgrade-desc{font-size:.72rem;color:var(--text-secondary);line-height:1.45;margin:0 0 10px}
+.sidebar-upgrade-btn{width:100%;padding:10px 12px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--purple-main),var(--purple-glow));color:#fff;font-family:var(--font-b);font-size:.82rem;font-weight:600;cursor:pointer}
+.sidebar-upgrade-btn:active{opacity:.9;transform:scale(.98)}
 .hist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 8px;border-radius:10px;cursor:pointer;transition:background .15s;position:relative}
 .hist-item:hover{background:rgba(124,58,237,.1)}
 .hist-item.active-chat{background:rgba(124,58,237,.18)}
@@ -296,34 +301,6 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 .bubble .md-content th{background:rgba(124,58,237,.15);color:var(--purple-light);font-weight:600}
 .bubble .md-content tr:nth-child(even) td{background:rgba(255,255,255,.02)}
 .pre-lang-label{position:absolute;top:6px;right:8px;font-size:.65rem;color:var(--purple-light);font-family:'Sora',sans-serif;letter-spacing:.05em;text-transform:uppercase;opacity:.7}
-
-/* ── VOICE BUTTON ── */
-.voice-btn{
-  width:42px;height:42px;border:1.5px solid var(--border);background:var(--bg-card);
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;flex-shrink:0;transition:border-color .2s,background .2s,box-shadow .2s;
-  color:var(--purple-light);
-}
-.voice-btn:hover{border-color:var(--purple-main);background:var(--bg-elevated)}
-.voice-btn svg{width:20px;height:20px;transition:transform .2s}
-.voice-btn.listening{
-  border-color:var(--red);background:rgba(244,63,94,.12);
-  box-shadow:0 0 0 0 rgba(244,63,94,.5);
-  animation:voicePulse 1.2s ease-out infinite;
-  color:var(--red);
-}
-.voice-btn.listening svg{transform:scale(1.15)}
-@keyframes voicePulse{
-  0%{box-shadow:0 0 0 0 rgba(244,63,94,.5)}
-  70%{box-shadow:0 0 0 10px rgba(244,63,94,0)}
-  100%{box-shadow:0 0 0 0 rgba(244,63,94,0)}
-}
-.voice-status{
-  font-size:.68rem;color:var(--red);text-align:center;
-  padding:2px 0 0;letter-spacing:.04em;
-  display:none;animation:thinkFade 1s infinite;
-}
-.voice-status.show{display:block}
 
 /* ── BOTTOM SHEET BASE ── */
 .sheet-overlay{
@@ -910,6 +887,11 @@ getRedirectResult(auth).catch(()=>{});
   </div>
   <div class="sidebar-section">Today</div>
   <div class="chat-hist-list" id="chatHistList"></div>
+  <div class="sidebar-upgrade" id="sidebarUpgrade">
+    <div class="sidebar-upgrade-title">💜 SKONGA Pro</div>
+    <p class="sidebar-upgrade-desc">Umefikia kikomo? Lipa kwa M-Pesa, Tigo, Airtel au Halo — endelea bila kulazimishwa.</p>
+    <button type="button" class="sidebar-upgrade-btn" onclick="openSkongaPay()">Lipa sasa</button>
+  </div>
 </div>
 
 <!-- OVERLAY (closes sidebar & attach popup) -->
@@ -966,14 +948,10 @@ getRedirectResult(auth).catch(()=>{});
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
       <textarea id="msgInput" class="msg-input" placeholder="Message SKONGA AI..." rows="1" aria-label="Andika ujumbe"></textarea>
-      <button class="voice-btn" id="voiceBtn" aria-label="Voice input" style="display:none">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-      </button>
       <button class="send-btn" id="sendBtn" aria-label="Tuma">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
     </div>
-    <div class="voice-status" id="voiceStatus">● Listening...</div>
   </div>
 </div>
 
@@ -1228,25 +1206,6 @@ getRedirectResult(auth).catch(()=>{});
       </div>
     </div>
 
-    <!-- Voice -->
-    <div class="settings-section">
-      <div class="settings-section-label">Voice</div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-icon si-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div>
-          <div><div>Voice Input</div><div class="setting-desc">Experimental — may not work on all devices</div></div>
-        </div>
-        <label class="toggle"><input type="checkbox" id="voiceToggle" onchange="applyVoiceSetting()"><span class="toggle-slider"></span></label>
-      </div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-icon si-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
-          <div><div>Auto-send after speech</div><div class="setting-desc">Message sent automatically</div></div>
-        </div>
-        <label class="toggle"><input type="checkbox" id="autoSendToggle" checked><span class="toggle-slider"></span></label>
-      </div>
-    </div>
-
     <!-- Data & Privacy -->
     <div class="settings-section">
       <div class="settings-section-label">Data & Privacy</div>
@@ -1444,7 +1403,6 @@ getRedirectResult(auth).catch(()=>{});
    INIT                                — startup sequence
    SETTINGS                            — language, style, theme, toggles
    PROFILE / AUTH
-   VOICE INPUT                         — SpeechRecognition wiring
    sendMessage()                       — main chat send/route/stream flow
    ══════════════════════════════════════════════════════════════ */
 /* ══════════════════════════════════════
@@ -1500,7 +1458,7 @@ const CHANGELOG = [
     'SKONGA Pay: lipa kwa M-Pesa, Tigo, Airtel au Halo moja kwa moja baada ya kufikia kikomo cha bure — bila kulazimishwa upgrade.',
     'Removed demo/mock chat messages for a clean professional start.',
     'Simplified login (email only) — Google sign-in removed from the app UI.',
-    'Voice input off by default (unreliable on many Android WebViews); can be re-enabled in Settings if your device supports it.',
+    'Voice input removed (unreliable on Android WebView/APK).',
     'Softer, more respectful limit messaging in Swahili.'
   ]},
   { version:'0.9', date:'July 2026', items:[
@@ -1800,7 +1758,6 @@ const SESSION_ID_KEY = 'skonga_device_session_id';
 ══════════════════════════════════════ */
 const PERMISSION_COPY = {
   camera: { icon:'📷', title:'Camera access', body:'SKONGA uses your camera only for the Scan to Solve feature — to photograph a problem so the AI can read and solve it. Nothing is recorded or uploaded until you tap capture.' },
-  microphone: { icon:'🎙️', title:'Microphone access', body:'SKONGA uses your microphone only while you\'re actively tapping the voice button, to convert your speech into a typed message. Nothing is recorded in the background.' },
   notifications: { icon:'🔔', title:'Notifications', body:'SKONGA can notify you when an AI reply finishes while you\'ve switched to another app, so you don\'t have to keep checking back. You can turn this off anytime in Settings.' }
 };
 const RATIONALE_SHOWN_KEY = 'skonga_permission_rationale_shown';
@@ -3422,17 +3379,7 @@ function showUpgradeCard(originalText){
 }
 
 function openSkongaPay(){
-  // Navigate to the integrated mobile-money page
-  try {
-    if (window.Capacitor?.Plugins?.Browser) {
-      // Prefer in-app browser if available; otherwise same-origin navigation
-      window.location.href = './pay.html';
-    } else {
-      window.location.href = './pay.html';
-    }
-  } catch(e) {
-    window.location.href = './pay.html';
-  }
+  window.location.href = './pay.html';
 }
 
 function routeError(err, originalText){
@@ -4068,8 +4015,6 @@ const SETTINGS_STORAGE_KEY = 'skonga_settings_v1';
 const appSettings = {
   lang: 'auto',
   style: 'balanced',
-  voice: false, // disabled by default — unreliable on many Android WebViews
-  autoSend: true,
   history: true,
   userName: '',
   notificationsEnabled: false,
@@ -4096,12 +4041,9 @@ function applySettingsToUI(){
   document.querySelectorAll('#langSeg .seg-btn').forEach(b=>{ b.classList.toggle('active', b.dataset.val===appSettings.lang); });
   document.querySelectorAll('#styleSeg .seg-btn').forEach(b=>{ b.classList.toggle('active', b.dataset.val===appSettings.style); });
   document.querySelectorAll('#themeSeg .seg-btn').forEach(b=>{ b.classList.toggle('active', b.dataset.val===(appSettings.theme||'dark')); });
-  $('voiceToggle').checked = appSettings.voice;
-  $('autoSendToggle').checked = appSettings.autoSend;
   $('historyToggle').checked = appSettings.history;
   $('notificationsToggle').checked = appSettings.notificationsEnabled;
   $('userNameInput').value = appSettings.userName || '';
-  $('voiceBtn').style.display = appSettings.voice ? 'flex' : 'none';
   if(appSettings.notificationsEnabled) ensureNotifyChannels();
 }
 
@@ -4122,10 +4064,6 @@ $('userNameInput').addEventListener('input', function(){
   persistSettings();
 });
 
-$('autoSendToggle').addEventListener('change', function(){
-  appSettings.autoSend = this.checked;
-  persistSettings();
-});
 
 $('historyToggle').addEventListener('change', function(){
   appSettings.history = this.checked;
@@ -4162,12 +4100,6 @@ function setThemeSeg(btn){
   applyTheme();
 }
 
-function applyVoiceSetting(){
-  const on = $('voiceToggle').checked;
-  appSettings.voice = on;
-  $('voiceBtn').style.display = on ? 'flex' : 'none';
-  persistSettings();
-}
 
 function confirmClearHistory(){
   if(confirm('Are you sure? All history will be deleted.')){
@@ -4436,228 +4368,6 @@ window.addEventListener('fbAuthChanged', e => {
     return _orig(url, opts);
   };
 })();
-
-/* ══════════════════════════════════════
-   VOICE INPUT (Speech-to-Text)
-   ------------------------------------------------------------
-   IMPORTANT: the Web Speech API (SpeechRecognition /
-   webkitSpeechRecognition) DOES NOT actually work inside an Android
-   WebView, even though the objects exist and recognition.start()
-   doesn't throw. Chrome's built-in speech recognition backend is
-   only authorized for the standalone Chrome browser app — apps that
-   embed WebView (which is exactly what Capacitor does) get a
-   'network' error or just silent failure the moment listening
-   actually starts, regardless of mic permission being granted. This
-   is a known, long-standing Android platform limitation, not a bug
-   in this code specifically.
-
-   FIX: on the actual packaged app (native Android via Capacitor), we
-   use @capacitor-community/speech-recognition instead, which talks
-   directly to Android's on-device SpeechRecognizer — no WebView
-   restriction, and it also works fully offline on most devices. The
-   Web Speech API path below is kept ONLY as a fallback for when
-   you're testing this same HTML file in a regular desktop/mobile
-   Chrome browser (outside the APK), where it works fine.
-══════════════════════════════════════ */
-let isListening = false;
-let voiceMode = null; // 'native' | 'web' | null (unsupported)
-let webRecognition = null; // Web Speech API instance (browser-testing fallback only)
-
-function getNativeSpeechPlugin(){
-  return window.Capacitor?.Plugins?.SpeechRecognition || null;
-}
-
-(function initSpeech(){
-  if(isNativeApp){
-    const plugin = getNativeSpeechPlugin();
-    if(plugin){
-      voiceMode = 'native';
-      return;
-    }
-    // On Android WebView, Web Speech API fails silently with a 'network'
-    // error — native plugin not installed/synced yet. Show mic button
-    // but handle gracefully in toggleVoice().
-    voiceMode = 'native-missing';
-    return;
-  }
-  // Browser testing fallback
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ $('voiceBtn').style.display='none'; voiceMode = null; return; }
-  voiceMode = 'web';
-  webRecognition = new SR();
-  webRecognition.continuous = false;
-  webRecognition.interimResults = true;
-  webRecognition.maxAlternatives = 1;
-  webRecognition.lang = 'en-US';
-
-  webRecognition.onstart = ()=> setListeningUI(true);
-  webRecognition.onresult = (e)=>{
-    let interim='', final='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const t=e.results[i][0].transcript;
-      if(e.results[i].isFinal) final+=t; else interim+=t;
-    }
-    $('msgInput').value = final || interim;
-    $('msgInput').dispatchEvent(new Event('input'));
-  };
-  webRecognition.onend = ()=>{
-    setListeningUI(false);
-    const text = $('msgInput').value.trim();
-    if(text && $('autoSendToggle').checked) setTimeout(()=>sendMessage(), 400);
-  };
-  webRecognition.onerror = (e)=>{
-    setListeningUI(false);
-    if(e.error==='not-allowed'||e.error==='permission-denied')
-      showToast('Microphone permission is required. Please allow it in your phone Settings.', true);
-    else if(e.error==='no-speech')
-      showToast('No speech detected. Please try again.', true);
-    else if(e.error==='network')
-      showToast('Voice input does not work in browser — it works fully in the installed APK.', true);
-    else if(e.error!=='aborted')
-      showToast('Voice input failed: '+e.error+'. Please try again.', true);
-  };
-})();
-
-function setListeningUI(listening){
-  isListening = listening;
-  $('voiceBtn').classList.toggle('listening', listening);
-  $('voiceStatus').classList.toggle('show', listening);
-  $('msgInput').placeholder = listening ? '🎙️ Listening...' : 'Message SKONGA AI...';
-}
-
-let micStream = null;
-async function ensureMicPermission(){
-  if(voiceMode==='native'||voiceMode==='native-missing'){
-    const plugin = getNativeSpeechPlugin();
-    if(!plugin) return true; // handled in toggleVoice
-    try{
-      const status = await plugin.requestPermissions();
-      const granted = status?.speechRecognition === 'granted' ||
-                      status?.granted === 'granted' ||
-                      status === 'granted';
-      if(!granted){
-        showToast('Microphone permission denied — enable it in Settings ▸ Apps ▸ SKONGA AI ▸ Permissions.', true);
-        return false;
-      }
-      return true;
-    }catch(err){
-      console.error('Native mic permission error:', err);
-      showToast('Could not access the microphone.', true);
-      return false;
-    }
-  }
-  if(!navigator.mediaDevices?.getUserMedia) return true;
-  try{
-    micStream = await navigator.mediaDevices.getUserMedia({ audio:true });
-    micStream.getTracks().forEach(t=>t.stop());
-    micStream = null;
-    return true;
-  }catch(err){
-    if(err.name==='NotAllowedError'||err.name==='PermissionDeniedError')
-      showToast('Microphone permission denied — enable it in phone Settings.', true);
-    else if(err.name==='NotFoundError')
-      showToast('No microphone found on this device.', true);
-    else showToast('Could not access the microphone.', true);
-    return false;
-  }
-}
-
-let nativePartialListener = null;
-let nativeListeningStateListener = null;
-let nativeListenFinalized = false;
-let nativeListenTimeoutId = null;
-
-function forceFinalizeNativeListening(){
-  if(nativeListenFinalized) return;
-  nativeListenFinalized = true;
-  if(nativeListenTimeoutId){ clearTimeout(nativeListenTimeoutId); nativeListenTimeoutId=null; }
-  setListeningUI(false);
-  if(nativePartialListener){ nativePartialListener.remove(); nativePartialListener=null; }
-  if(nativeListeningStateListener){ nativeListeningStateListener.remove(); nativeListeningStateListener=null; }
-  const text = $('msgInput').value.trim();
-  if(text && $('autoSendToggle').checked) setTimeout(()=>sendMessage(), 400);
-}
-
-async function startNativeListening(){
-  const plugin = getNativeSpeechPlugin();
-  const lang = appSettings.lang==='en' ? 'en-US' : 'sw-TZ';
-  $('msgInput').value='';
-  nativeListenFinalized = false;
-  setListeningUI(true);
-
-  try{
-    if(nativePartialListener){ nativePartialListener.remove(); nativePartialListener=null; }
-    if(nativeListeningStateListener){ nativeListeningStateListener.remove(); nativeListeningStateListener=null; }
-    if(nativeListenTimeoutId){ clearTimeout(nativeListenTimeoutId); }
-
-    nativePartialListener = await plugin.addListener('partialResults', (data)=>{
-      // Plugin v5/v6 may return {matches:[...]} or {value:[...]} or {result:'...'}
-      const match = data?.matches?.[0] || data?.value?.[0] || data?.result || null;
-      if(match && typeof match === 'string' && match.trim()){
-        $('msgInput').value = match.trim();
-        $('msgInput').dispatchEvent(new Event('input'));
-      }
-    });
-
-    nativeListeningStateListener = await plugin.addListener('listeningState', (data)=>{
-      const stopped = data?.status==='stopped' || data?.state==='stopped' || data===false;
-      if(stopped) forceFinalizeNativeListening();
-    });
-
-    await plugin.start({ language: lang, maxResults: 1, partialResults: true, popup: false });
-
-    // Safety-net: if listeningState never fires (device-specific quirk),
-    // force-finalize after 15 seconds so the UI doesn't stay stuck.
-    nativeListenTimeoutId = setTimeout(()=>{
-      console.warn('Voice: listeningState timeout — force-finalizing');
-      forceFinalizeNativeListening();
-    }, 15000);
-
-  }catch(err){
-    console.error('Native speech start error:', err);
-    forceFinalizeNativeListening();
-    showToast('Voice input failed to start: '+err.message+'. Please try again.', true);
-  }
-}
-
-async function toggleVoice(){
-  if(!voiceMode||voiceMode===null){
-    showToast('Your device does not support voice input.', true);
-    return;
-  }
-  if(voiceMode==='native-missing'){
-    showToast('Voice plugin not installed yet. See VOICE-INPUT-FIX.md in the repo.', true);
-    return;
-  }
-  if(isListening){
-    if(voiceMode==='native'){
-      getNativeSpeechPlugin()?.stop();
-      setTimeout(()=>{ if(isListening) forceFinalizeNativeListening(); }, 2000);
-    } else {
-      webRecognition?.stop();
-    }
-    return;
-  }
-  const wantsToProceed = await showPermissionRationale('microphone');
-  if(!wantsToProceed) return;
-  const granted = await ensureMicPermission();
-  if(!granted) return;
-
-  if(voiceMode==='native'){
-    startNativeListening();
-    return;
-  }
-  // Web fallback path
-  const lang = appSettings.lang;
-  webRecognition.lang = lang==='en'?'en-US':'sw-TZ';
-  $('msgInput').value='';
-  try{
-    webRecognition.start();
-  } catch(err){
-    showToast('Voice input already running or unavailable.', true);
-  }
-}
-$('voiceBtn').addEventListener('click', toggleVoice);
 
 // newChat button in header — reuse editBtn id kept for compatibility
 // settingsBtn already bound above
