@@ -15,8 +15,8 @@
       --surface:   #131820;
       --card:      #1A2230;
       --border:    #232E3E;
-      --accent:    #00E07A;   /* M-Pesa / success green */
-      --accent2:   #0EA5E9;   /* info / status blue */
+      --accent:    #00E07A;
+      --accent2:   #0EA5E9;
       --warn:      #F59E0B;
       --danger:    #EF4444;
       --text:      #E8EDF4;
@@ -36,7 +36,6 @@
       min-height: 100vh;
     }
 
-    /* ── HEADER ── */
     header {
       padding: 20px 24px;
       display: flex;
@@ -86,16 +85,13 @@
     .dot.offline { background: var(--danger); box-shadow: 0 0 0 3px rgba(239,68,68,.18); animation: none; }
     .dot.checking{ background: var(--accent2);box-shadow: 0 0 0 3px rgba(14,165,233,.18); }
 
-    /* ── LAYOUT ── */
     main {
       max-width: 540px;
       margin: 0 auto;
       padding: 32px 16px 80px;
     }
 
-    .hero {
-      margin-bottom: 32px;
-    }
+    .hero { margin-bottom: 32px; }
     .hero h1 {
       font-family: var(--display);
       font-size: clamp(1.6rem, 5vw, 2.2rem);
@@ -107,7 +103,6 @@
     .hero h1 em { color: var(--accent); font-style: normal; }
     .hero p { color: var(--muted); font-size: 14px; }
 
-    /* ── NETWORKS ── */
     .network-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -134,7 +129,6 @@
       box-shadow: 0 0 0 1px rgba(0,224,122,.15);
     }
 
-    /* ── CARD ── */
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -157,7 +151,6 @@
       font-family: var(--body);
     }
 
-    /* ── FORM ── */
     .field { margin-bottom: 18px; }
     label {
       display: block;
@@ -167,9 +160,7 @@
       margin-bottom: 7px;
       letter-spacing: .02em;
     }
-    .input-wrap {
-      position: relative;
-    }
+    .input-wrap { position: relative; }
     .prefix {
       position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
       color: var(--muted); font-size: 14px; font-weight: 500;
@@ -196,7 +187,6 @@
     input::placeholder { color: var(--muted); }
     input:read-only { opacity: .55; cursor: not-allowed; }
 
-    /* Network badge inside input */
     .net-badge {
       position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
       font-size: 11px; font-weight: 600;
@@ -209,7 +199,6 @@
     }
     .net-badge.show { opacity: 1; }
 
-    /* Amount hint */
     .amount-hint {
       font-size: 12px; color: var(--muted); margin-top: 5px;
       min-height: 18px;
@@ -217,7 +206,6 @@
     }
     .amount-hint.valid { color: var(--accent); }
 
-    /* ── BUTTON ── */
     .btn {
       width: 100%;
       padding: 15px;
@@ -247,7 +235,6 @@
       margin-top: 10px;
     }
 
-    /* spinner */
     .spinner {
       width: 18px; height: 18px;
       border: 2.5px solid rgba(5,10,5,.4);
@@ -258,24 +245,6 @@
     }
     @keyframes spin { to{ transform: rotate(360deg); } }
 
-    /* ── ALERT ── */
-    .alert {
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-      font-size: 14px;
-      margin-top: 16px;
-      display: none;
-      border: 1px solid;
-    }
-    .alert-title {
-      font-weight: 600; margin-bottom: 4px;
-      font-family: var(--display);
-    }
-    .alert.success { background: rgba(0,224,122,.08); border-color: rgba(0,224,122,.3); color: #d1fae5; }
-    .alert.error   { background: rgba(239,68,68,.08);  border-color: rgba(239,68,68,.3);  color: #fecaca; }
-    .alert.info    { background: rgba(14,165,233,.08); border-color: rgba(14,165,233,.3); color: #bae6fd; }
-
-    /* ── RESULT CARD ── */
     .result-card {
       display: none;
       background: var(--card);
@@ -325,7 +294,6 @@
     }
     .ref-box strong { color: var(--text); display: block; margin-bottom: 2px; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
 
-    /* ── STATUS TAB ── */
     .tab-row {
       display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
       background: var(--surface);
@@ -352,7 +320,6 @@
     .panel { display: none; }
     .panel.active { display: block; }
 
-    /* ── STATUS CHECK ── */
     .status-badge {
       display: inline-flex; align-items: center; gap: 5px;
       font-size: 12px; font-weight: 600; padding: 4px 12px;
@@ -362,11 +329,9 @@
     .status-badge.PENDING  { background: rgba(245,158,11,.12); color: var(--warn); }
     .status-badge.FAILED   { background: rgba(239,68,68,.12);  color: var(--danger); }
 
-    /* ── FIELD ERROR STATE ── */
     input.field-error { border-color: var(--danger); }
     .field-error-msg { font-size: 12px; color: var(--danger); margin-top: 5px; min-height: 16px; }
 
-    /* ── COPY BUTTON ── */
     .ref-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .copy-btn {
       background: var(--surface);
@@ -382,7 +347,6 @@
     .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
     .copy-btn.copied { color: var(--accent); border-color: var(--accent); }
 
-    /* ── POLLING NOTICE ── */
     .poll-note {
       display: flex; align-items: center; gap: 8px;
       font-size: 12px; color: var(--accent2);
@@ -400,7 +364,6 @@
       cursor: pointer;
     }
 
-    /* ── SETTINGS (DEV) PANEL ── */
     .dev-toggle {
       display: flex; align-items: center; gap: 6px;
       background: none; border: none; color: var(--muted);
@@ -426,7 +389,6 @@
       font-family: var(--body); font-weight: 600; font-size: 13px; cursor: pointer;
     }
 
-    /* ── FOOTER ── */
     footer {
       text-align: center;
       font-size: 12px;
@@ -436,7 +398,6 @@
     }
     footer a { color: var(--accent); text-decoration: none; }
 
-    /* ── RESPONSIVE ── */
     @media (max-width: 480px) {
       .card { padding: 20px 16px; }
       .network-row { grid-template-columns: repeat(4,1fr); gap: 6px; }
@@ -447,9 +408,15 @@
 <body>
 
 <header>
-  <div class="logo">
-    <div class="logo-icon">💸</div>
-    SKONGA <span>Pay</span>
+  <div style="display:flex;align-items:center;gap:12px">
+    <button type="button" onclick="window.location.href='./index.html'" aria-label="Rudi"
+      style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--body)">
+      ← Rudi
+    </button>
+    <div class="logo">
+      <div class="logo-icon">💸</div>
+      SKONGA <span>Pay</span>
+    </div>
   </div>
   <div class="status-dot" id="connStatus" role="status" aria-live="polite">
     <div class="dot" id="connDot"></div>
@@ -463,81 +430,47 @@
     <p>Ingiza nambari na kiasi — STK Push itumwe moja kwa moja simu yako.</p>
   </div>
 
-  <!-- Network indicators -->
   <div class="network-row">
-    <div class="net-chip" id="net-mpesa">
-      <span class="icon">🟢</span>M-Pesa
-    </div>
-    <div class="net-chip" id="net-tigo">
-      <span class="icon">🔵</span>Tigo
-    </div>
-    <div class="net-chip" id="net-airtel">
-      <span class="icon">🔴</span>Airtel
-    </div>
-    <div class="net-chip" id="net-halo">
-      <span class="icon">🟠</span>Halo
-    </div>
+    <div class="net-chip" id="net-mpesa"><span class="icon">🟢</span>M-Pesa</div>
+    <div class="net-chip" id="net-tigo"><span class="icon">🔵</span>Tigo</div>
+    <div class="net-chip" id="net-airtel"><span class="icon">🔴</span>Airtel</div>
+    <div class="net-chip" id="net-halo"><span class="icon">🟠</span>Halo</div>
   </div>
 
-  <!-- Tabs -->
   <div class="tab-row">
     <button class="tab active" onclick="switchTab('pay')">💳 Lipa Sasa</button>
     <button class="tab" onclick="switchTab('check')">🔍 Angalia Malipo</button>
   </div>
 
-  <!-- PAY PANEL -->
   <div class="panel active" id="panel-pay">
     <div class="card">
-      <div class="card-title">
-        Tuma Ombi la Malipo
-        <span class="badge">Stakaba USSD Push</span>
-      </div>
-
+      <div class="card-title">Tuma Ombi la Malipo<span class="badge">Stakaba USSD Push</span></div>
       <div class="field">
         <label>Nambari ya Simu</label>
         <div class="input-wrap">
           <span class="prefix">🇹🇿</span>
-          <input
-            type="tel"
-            id="phoneInput"
-            class="has-prefix"
-            placeholder="0742 000 000"
-            maxlength="12"
-            oninput="onPhoneInput(this)"
-          />
+          <input type="tel" id="phoneInput" class="has-prefix" placeholder="0742 000 000" maxlength="12" oninput="onPhoneInput(this)" />
           <span class="net-badge" id="netBadge"></span>
         </div>
         <div class="field-error-msg" id="phoneError"></div>
       </div>
-
       <div class="field">
         <label>Kiasi (TZS)</label>
         <div class="input-wrap">
           <span class="prefix">TSh</span>
-          <input
-            type="number"
-            id="amountInput"
-            class="has-prefix"
-            placeholder="5,000"
-            min="1"
-            oninput="onAmountInput(this)"
-          />
+          <input type="number" id="amountInput" class="has-prefix" placeholder="5,000" min="1" oninput="onAmountInput(this)" />
         </div>
         <div class="amount-hint" id="amountHint"></div>
       </div>
-
       <div class="field">
         <label>Mtandao (auto-detect)</label>
         <input type="text" id="networkDisplay" placeholder="Inangoja nambari…" readonly />
       </div>
-
       <button class="btn btn-primary" id="payBtn" onclick="initiatePayment()" disabled>
         <span class="spinner" id="paySpinner"></span>
         <span id="payBtnText">Tuma STK Push</span>
       </button>
     </div>
-
-    <!-- Payment result -->
     <div class="result-card" id="payResult">
       <div class="result-header">
         <div class="result-icon success" id="payResultIcon">📲</div>
@@ -551,27 +484,18 @@
     </div>
   </div>
 
-  <!-- CHECK PANEL -->
   <div class="panel" id="panel-check">
     <div class="card">
       <div class="card-title">Angalia Hali ya Malipo</div>
-
       <div class="field">
         <label>Reference ID au Internal Reference</label>
-        <input
-          type="text"
-          id="refInput"
-          placeholder="SKG-A1B2C3D4E5F6G7H8"
-          oninput="document.getElementById('checkBtn').disabled = !this.value.trim()"
-        />
+        <input type="text" id="refInput" placeholder="SKG-A1B2C3D4E5F6G7H8" oninput="document.getElementById('checkBtn').disabled = !this.value.trim()" />
       </div>
-
       <button class="btn btn-primary" id="checkBtn" onclick="checkStatus()" disabled>
         <span class="spinner" id="checkSpinner"></span>
         <span id="checkBtnText">Angalia Hali</span>
       </button>
     </div>
-
     <div class="result-card" id="checkResult">
       <div class="result-header">
         <div class="result-icon" id="checkResultIcon">🔍</div>
@@ -585,18 +509,15 @@
     </div>
   </div>
 
-  <!-- API config notice -->
   <div class="card" style="margin-top:24px; padding:18px 20px;">
     <div style="display:flex; gap:12px; align-items:flex-start;">
       <span style="font-size:22px;">⚙️</span>
       <div style="flex:1;">
         <div style="font-family:var(--display); font-weight:600; font-size:.9rem; margin-bottom:4px;">Unganisha Backend</div>
         <div style="font-size:13px; color:var(--muted); line-height:1.7;" id="backendNotice">
-          Weka <code style="background:var(--surface); padding:1px 6px; border-radius:4px; color:var(--accent);">API_BASE</code> kwenye <code style="background:var(--surface); padding:1px 6px; border-radius:4px; color:var(--accent);">CONFIG</code> (juu ya script) au tumia paneli ya majaribio hapa chini. Backend yako ndiyo yenye funguo za kweli (Mpesa/Tigo/Airtel/Halo credentials) kwenye <code style="background:var(--surface); padding:1px 6px; border-radius:4px; color:var(--accent);">.env</code> — frontend haipaswi kubeba siri hizo kamwe.
+          Weka API_BASE kwenye CONFIG au tumia paneli ya majaribio. Backend inashikilia funguo za Mpesa/Tigo/Airtel/Halo.
         </div>
-
         <button class="dev-toggle" onclick="toggleDevPanel()" id="devToggleBtn">🔧 Fungua paneli ya majaribio</button>
-
         <div class="dev-panel" id="devPanel">
           <div class="field">
             <label for="apiBaseInput">Backend API URL (Render)</label>
@@ -604,12 +525,10 @@
           </div>
           <div class="dev-row" style="margin-bottom:12px;">
             <input type="checkbox" id="forceSimCheckbox" />
-            <label style="margin:0;" for="forceSimCheckbox">Lazimisha Simulation mode (ignore backend)</label>
+            <label style="margin:0;" for="forceSimCheckbox">Lazimisha Simulation mode</label>
           </div>
           <button class="dev-save-btn" onclick="applyDevSettings()">Hifadhi na Ujaribu Muunganisho</button>
-          <div class="dev-hint" id="devHint">
-            Hii ni ya kikao hiki tu (haihifadhiwi baada ya kufunga ukurasa). Ukishakuwa tayari na URL ya kudumu, iweke ndani ya <code style="background:var(--card); padding:1px 5px; border-radius:4px;">CONFIG.API_BASE</code> kwenye faili hili.
-          </div>
+          <div class="dev-hint" id="devHint">Hii ni ya kikao hiki tu.</div>
         </div>
       </div>
     </div>
@@ -617,44 +536,26 @@
 </main>
 
 <footer>
-  Powered by <a href="#">SKONGA AI</a> · Stakaba Tanzania · MIT License
+  Powered by <a href="./">SKONGA AI</a> · Stakaba Tanzania · MIT License
 </footer>
 
 <script>
-  // ════════════════════════════════════════════════════════════
-  // CONFIG — hii ndiyo sehemu pekee unayohitaji kugusa baadaye
-  // ════════════════════════════════════════════════════════════
-  // Backend yako (Node/Express kwenye Render, kwa mfano) ndiyo
-  // inayoshikilia funguo za kweli za Mpesa/Tigo/Airtel/Halo kwenye
-  // faili la .env — SIYO frontend hii. Frontend inahitaji tu URL
-  // ya public ya backend yako.
-  //
-  // Njia 3 za kuweka API_BASE, kwa mpangilio wa kipaumbele:
-  //   1) window.SKONGA_CONFIG.API_BASE  — ukiweka <script> nyingine
-  //      kabla ya hii (mfano: ukiitumia kwenye CMS/deploy tofauti)
-  //   2) ?api=https://... kwenye URL ya ukurasa huu (rahisi kwa majaribio)
-  //   3) Thamani ya moja kwa moja hapa chini (CONFIG.API_BASE)
-  //
-  // Paneli ya "🔧 Fungua paneli ya majaribio" chini ya ukurasa
-  // inakuruhusu kujaribu URL bila kuhariri code — ni ya kikao hicho tu.
   const CONFIG = {
-    API_BASE: '',              // e.g. 'https://your-backend.onrender.com/api/payments'
-    HEALTH_PATH: '/health',    // endpoint ndogo kwenye backend yako inayorudisha 200 OK
-    FORCE_SIMULATE: false,     // true = daima tumia mock, hata kama backend ipo
+    API_BASE: '',
+    HEALTH_PATH: '/health',
+    FORCE_SIMULATE: false,
     REQUEST_TIMEOUT_MS: 15000,
     HEALTHCHECK_TIMEOUT_MS: 6000,
     POLL_INTERVAL_MS: 4000,
     POLL_MAX_MS: 90000,
   };
 
-  // Runtime state (session-only — hatuhifadhi kwenye localStorage
-  // kwa sababu ya usalama/uoanifu wa mazingira ya artifact preview)
   const state = {
     apiBase: (new URLSearchParams(location.search)).get('api')
              || (window.SKONGA_CONFIG && window.SKONGA_CONFIG.API_BASE)
              || CONFIG.API_BASE,
     forceSimulate: CONFIG.FORCE_SIMULATE,
-    live: false,           // backend imethibitishwa inafanya kazi?
+    live: false,
     isSubmittingPay: false,
     isSubmittingCheck: false,
     pollTimer: null,
@@ -665,11 +566,9 @@
     return state.forceSimulate || !state.apiBase || !state.live;
   }
 
-  // ─── CONNECTION STATUS (health check) ─────────────────────
   async function refreshConnectionStatus() {
     const dot = document.getElementById('connDot');
     const label = document.getElementById('connLabel');
-
     if (state.forceSimulate) {
       dot.className = 'dot sim';
       label.textContent = 'Simulation mode (lazimishwa)';
@@ -682,7 +581,6 @@
       state.live = false;
       return;
     }
-
     dot.className = 'dot checking';
     label.textContent = 'Inakagua muunganisho…';
     try {
@@ -705,7 +603,6 @@
     }
   }
 
-  // ─── DEV / SETTINGS PANEL ──────────────────────────────────
   function toggleDevPanel() {
     const panel = document.getElementById('devPanel');
     const btn = document.getElementById('devToggleBtn');
@@ -722,28 +619,23 @@
     const url = document.getElementById('apiBaseInput').value.trim();
     const forceSim = document.getElementById('forceSimCheckbox').checked;
     const hint = document.getElementById('devHint');
-
     if (url && !/^https?:\/\//i.test(url)) {
       hint.innerHTML = '⚠️ URL lazima ianze na http:// au https://';
       hint.style.color = 'var(--danger)';
       return;
     }
-
     state.apiBase = url;
     state.forceSimulate = forceSim;
     hint.style.color = 'var(--muted)';
     hint.textContent = 'Inakagua muunganisho…';
-
     await refreshConnectionStatus();
-
     hint.innerHTML = state.live
-      ? '✅ Imeunganishwa! Sasa maombi yatakwenda kwa backend halisi.'
+      ? '✅ Imeunganishwa!'
       : forceSim
-        ? 'Simulation imelazimishwa — maombi yote ni ya kujifanya.'
-        : '⚠️ Haikuweza kufika backend hiyo. Bado inatumia demo mpaka itakapopatikana. Hakikisha URL ni sahihi na backend ina endpoint ' + CONFIG.HEALTH_PATH + '.';
+        ? 'Simulation imelazimishwa.'
+        : '⚠️ Backend haipatikani — demo mode.';
   }
 
-  // ─── NETWORK DETECTION ───────────────────────────────────
   function detectNetwork(phone) {
     let p = phone.replace(/\s+/g, '').replace(/^\+/, '');
     if (p.startsWith('0')) p = '255' + p.slice(1);
@@ -781,9 +673,7 @@
     const badge = document.getElementById('netBadge');
     const netDisp = document.getElementById('networkDisplay');
     const errMsg = document.getElementById('phoneError');
-
     Object.values(netChipMap).forEach(id => document.getElementById(id).classList.remove('active'));
-
     if (net) {
       badge.textContent = networkLabel(net);
       badge.classList.add('show');
@@ -796,7 +686,7 @@
       if (el.value.length >= 9) {
         netDisp.value = 'Nambari haijulikani';
         el.classList.add('field-error');
-        errMsg.textContent = 'Nambari haitambuliki. Tumia namba ya M-Pesa, Tigo, Airtel au Halo yenye ufanisi.';
+        errMsg.textContent = 'Nambari haitambuliki. Tumia M-Pesa, Tigo, Airtel au Halo.';
       } else {
         netDisp.value = '';
         el.classList.remove('field-error');
@@ -810,8 +700,8 @@
     const v = parseInt(el.value, 10);
     const hint = document.getElementById('amountHint');
     if (!el.value) { hint.textContent = ''; hint.className = 'amount-hint'; }
-    else if (isNaN(v) || v < 1) { hint.textContent = 'Ingiza kiasi halali (TZS 1 au zaidi)'; hint.className = 'amount-hint'; }
-    else if (v > 10000000) { hint.textContent = 'Kiasi kimezidi kikomo (TZS 10,000,000)'; hint.className = 'amount-hint'; }
+    else if (isNaN(v) || v < 1) { hint.textContent = 'Ingiza kiasi halali (TZS 1+)'; hint.className = 'amount-hint'; }
+    else if (v > 10000000) { hint.textContent = 'Kiasi kimezidi kikomo'; hint.className = 'amount-hint'; }
     else { hint.textContent = `TSh ${v.toLocaleString('sw')} ✓`; hint.className = 'amount-hint valid'; }
     validateForm();
   }
@@ -823,7 +713,6 @@
     document.getElementById('payBtn').disabled = !valid || state.isSubmittingPay;
   }
 
-  // ─── TABS ─────────────────────────────────────────────────
   function switchTab(tab) {
     stopPolling();
     document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='pay')||(i===1&&tab==='check')));
@@ -831,7 +720,6 @@
     document.getElementById('panel-check').classList.toggle('active', tab === 'check');
   }
 
-  // ─── FETCH HELPER: timeout + one retry on network failure ─
   async function fetchWithTimeout(url, options = {}, timeoutMs = CONFIG.REQUEST_TIMEOUT_MS, retriesLeft = 1) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -844,29 +732,20 @@
       if (retriesLeft > 0 && err.name !== 'AbortError') {
         return fetchWithTimeout(url, options, timeoutMs, retriesLeft - 1);
       }
-      if (err.name === 'AbortError') {
-        throw new Error('Ombi limechukua muda mrefu sana (timeout). Jaribu tena.');
-      }
+      if (err.name === 'AbortError') throw new Error('Ombi limechukua muda mrefu sana (timeout).');
       throw new Error('Imeshindwa kufika backend. Kagua mtandao wako.');
     }
   }
 
   function friendlyHttpError(status, fallbackMsg) {
     const map = {
-      400: 'Taarifa ulizotuma si sahihi. Kagua namba na kiasi.',
-      401: 'Uthibitisho wa API umeshindwa. Kagua funguo za backend.',
-      403: 'Huna ruhusa ya kufanya ombi hili.',
-      404: 'Huduma hii haipatikani kwenye backend.',
-      408: 'Ombi limechukua muda mrefu sana.',
-      429: 'Maombi mengi kwa muda mfupi. Subiri kidogo kisha jaribu tena.',
-      500: 'Hitilafu ya ndani ya backend. Jaribu tena baadaye.',
-      502: 'Backend haipatikani kwa sasa (502).',
-      503: 'Huduma haipo kwa muda (503). Jaribu tena baadaye.',
+      400: 'Taarifa si sahihi.', 401: 'Uthibitisho umeshindwa.', 403: 'Huna ruhusa.',
+      404: 'Huduma haipatikani.', 429: 'Maombi mengi. Subiri kidogo.', 500: 'Hitilafu ya backend.',
+      502: 'Backend haipatikani (502).', 503: 'Huduma haipo kwa muda.',
     };
-    return map[status] || fallbackMsg || `Hitilafu isiyotarajiwa (HTTP ${status})`;
+    return map[status] || fallbackMsg || `Hitilafu (HTTP ${status})`;
   }
 
-  // ─── SIMULATE: local mock ─────────────────────────────────
   function mockInitiate({ phoneNumber, amount, network }) {
     return new Promise((res, rej) => {
       setTimeout(() => {
@@ -888,8 +767,6 @@
     });
   }
 
-  // simulation-only in-memory "database" so status-check polling
-  // has something consistent to converge towards for demo refs
   const simLedger = new Map();
 
   function mockStatus(ref) {
@@ -912,42 +789,34 @@
           data: {
             referenceId: ref.startsWith('SKG-') ? ref : 'SKG-DEMO0001',
             internalReference: ref.startsWith('M_SIM_') ? ref : 'M_SIM_DEMO01',
-            phoneNumber: '255742000000',
-            amount: 5000,
-            provider: 'MPESA',
+            phoneNumber: '255742000000', amount: 5000, provider: 'MPESA',
             status: entry.status,
-            resultDesc: entry.status === 'SUCCESS' ? 'Malipo yamekamilika' : entry.status === 'FAILED' ? 'Malipo yameshindwa' : 'Inasubiri uingizaji wa PIN',
-            createdAt: entry.createdAt,
-            updatedAt: new Date().toISOString()
+            resultDesc: entry.status === 'SUCCESS' ? 'Malipo yamekamilika' : entry.status === 'FAILED' ? 'Malipo yameshindwa' : 'Inasubiri PIN',
+            createdAt: entry.createdAt, updatedAt: new Date().toISOString()
           }
         });
       }, 500 + Math.random()*400);
     });
   }
 
-  // ─── INITIATE PAYMENT ─────────────────────────────────────
   async function initiatePayment() {
     if (state.isSubmittingPay) return;
     const phone = document.getElementById('phoneInput').value.trim();
     const amount = parseInt(document.getElementById('amountInput').value, 10);
     const network = detectNetwork(phone);
-
     if (!isValidTzPhone(phone) || !network) {
-      showPayError('Nambari ya simu si sahihi. Tumia namba ya M-Pesa, Tigo, Airtel au Halo.');
+      showPayError('Nambari si sahihi. Tumia M-Pesa, Tigo, Airtel au Halo.');
       return;
     }
     if (isNaN(amount) || amount < 1) {
-      showPayError('Ingiza kiasi halali (TZS 1 au zaidi).');
+      showPayError('Ingiza kiasi halali.');
       return;
     }
-
     state.isSubmittingPay = true;
     setLoading('pay', true);
     hideResult('payResult');
     stopPolling();
-
-    const idempotencyKey = (crypto.randomUUID ? crypto.randomUUID() : 'idem-' + Date.now() + '-' + Math.random().toString(36).slice(2));
-
+    const idempotencyKey = (crypto.randomUUID ? crypto.randomUUID() : 'idem-' + Date.now());
     try {
       let data;
       if (isSimulating()) {
@@ -955,18 +824,13 @@
       } else {
         const res = await fetchWithTimeout(`${state.apiBase.replace(/\/$/,'')}/initiate`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Idempotency-Key': idempotencyKey,
-          },
+          headers: { 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
           body: JSON.stringify({ phoneNumber: normalizePhone(phone), amount, network })
         });
         let payload;
         try { payload = await res.json(); }
         catch { throw new Error('Backend haikurudisha JSON sahihi.'); }
-        if (!res.ok || !payload.success) {
-          throw new Error(payload.message || friendlyHttpError(res.status));
-        }
+        if (!res.ok || !payload.success) throw new Error(payload.message || friendlyHttpError(res.status));
         data = payload;
       }
       showPayResult(data);
@@ -985,14 +849,12 @@
     document.getElementById('payResultIcon').textContent = '📲';
     document.getElementById('payResultTitle').textContent = 'STK Push Imetumwa!';
     document.getElementById('payResultSub').textContent = data.message || 'Ingiza PIN kwenye simu yako';
-
     const d = data.data;
     document.getElementById('payResultKV').innerHTML = `
       <div class="kv"><span class="kv-key">Nambari</span><span class="kv-val">${escapeHtml(d.phoneNumber)}</span></div>
       <div class="kv"><span class="kv-key">Kiasi</span><span class="kv-val accent">TSh ${Number(d.amount).toLocaleString('sw')}</span></div>
       <div class="kv"><span class="kv-key">Mtandao</span><span class="kv-val">${networkLabel(d.network)}</span></div>
-      <div class="kv"><span class="kv-key">Hali</span><span class="kv-val warn" id="payLiveStatus">${d.status}</span></div>
-    `;
+      <div class="kv"><span class="kv-key">Hali</span><span class="kv-val warn" id="payLiveStatus">${d.status}</span></div>`;
     document.getElementById('payResultRef').innerHTML = refBoxHtml(d.referenceId, d.internalReference);
     card.classList.add('show');
   }
@@ -1008,7 +870,6 @@
     card.classList.add('show');
   }
 
-  // ─── STATUS CHECK ─────────────────────────────────────────
   async function checkStatus(silent) {
     if (state.isSubmittingCheck && !silent) return;
     const ref = document.getElementById('refInput').value.trim();
@@ -1017,19 +878,15 @@
       setLoading('check', true);
       hideResult('checkResult');
     }
-
     try {
       let data;
-      if (isSimulating()) {
-        data = await mockStatus(ref);
-      } else {
+      if (isSimulating()) data = await mockStatus(ref);
+      else {
         const res = await fetchWithTimeout(`${state.apiBase.replace(/\/$/,'')}/${encodeURIComponent(ref)}`, { method: 'GET' });
         let payload;
         try { payload = await res.json(); }
         catch { throw new Error('Backend haikurudisha JSON sahihi.'); }
-        if (!res.ok || !payload.success) {
-          throw new Error(payload.message || friendlyHttpError(res.status));
-        }
+        if (!res.ok || !payload.success) throw new Error(payload.message || friendlyHttpError(res.status));
         data = payload;
       }
       showCheckResult(data, ref);
@@ -1050,21 +907,15 @@
     const card = document.getElementById('checkResult');
     const iconMap = { SUCCESS:'✅', PENDING:'⏳', FAILED:'❌' };
     const iconClass = { SUCCESS:'success', PENDING:'pending', FAILED:'error' };
-
     document.getElementById('checkResultIcon').className = `result-icon ${iconClass[d.status] || 'pending'}`;
     document.getElementById('checkResultIcon').textContent = iconMap[d.status] || '🔍';
     document.getElementById('checkResultTitle').textContent = d.status === 'SUCCESS' ? 'Malipo Yamekamilika' : d.status === 'FAILED' ? 'Malipo Yameshindwa' : 'Inasubiri…';
     document.getElementById('checkResultSub').textContent = d.resultDesc || '';
-
     document.getElementById('checkResultKV').innerHTML = `
       <div class="kv"><span class="kv-key">Nambari</span><span class="kv-val">${escapeHtml(d.phoneNumber || '–')}</span></div>
       <div class="kv"><span class="kv-key">Kiasi</span><span class="kv-val">TSh ${d.amount ? Number(d.amount).toLocaleString('sw') : '–'}</span></div>
       <div class="kv"><span class="kv-key">Mtandao</span><span class="kv-val">${escapeHtml(d.provider || '–')}</span></div>
-      <div class="kv"><span class="kv-key">Hali</span><span class="kv-val"><span class="status-badge ${d.status}">${d.status}</span></span></div>
-      <div class="divider"></div>
-      <div class="kv"><span class="kv-key">Iliundwa</span><span class="kv-val">${d.createdAt ? new Date(d.createdAt).toLocaleString('sw') : '–'}</span></div>
-      <div class="kv"><span class="kv-key">Ilisasishwa</span><span class="kv-val">${d.updatedAt ? new Date(d.updatedAt).toLocaleString('sw') : '–'}</span></div>
-    `;
+      <div class="kv"><span class="kv-key">Hali</span><span class="kv-val"><span class="status-badge ${d.status}">${d.status}</span></span></div>`;
     document.getElementById('checkResultRef').innerHTML = refBoxHtml(d.referenceId || refFallback, d.internalReference);
     card.classList.add('show');
   }
@@ -1080,12 +931,10 @@
     card.classList.add('show');
   }
 
-  // ─── AUTO-POLLING (after STK push, and manual "angalia") ──
   function startPolling(referenceId) {
     stopPolling();
     state.pollDeadline = Date.now() + CONFIG.POLL_MAX_MS;
     renderPollNote(true);
-
     state.pollTimer = setInterval(async () => {
       if (Date.now() > state.pollDeadline) { stopPolling(); return; }
       const status = await pollOnce(referenceId);
@@ -1129,35 +978,24 @@
     const note = document.createElement('div');
     note.className = 'poll-note';
     note.id = 'pollNote';
-    note.innerHTML = `<span class="mini-spin"></span> Inafuatilia hali moja kwa moja… <button type="button" onclick="stopPolling()">Simamisha</button>`;
+    note.innerHTML = `<span class="mini-spin"></span> Inafuatilia hali… <button type="button" onclick="stopPolling()">Simamisha</button>`;
     card.appendChild(note);
   }
 
-  // ─── COPY TO CLIPBOARD ──────────────────────────────────
   function refBoxHtml(referenceId, internalReference) {
     return `
-      <div class="ref-line">
-        <div><strong>Reference ID</strong>${escapeHtml(referenceId || '–')}</div>
-        <button class="copy-btn" onclick="copyText('${escapeAttr(referenceId)}', this)">Nakili</button>
-      </div>
-      <div class="ref-line" style="margin-top:8px;">
-        <div><strong>Internal Reference</strong>${escapeHtml(internalReference || '–')}</div>
-        <button class="copy-btn" onclick="copyText('${escapeAttr(internalReference)}', this)">Nakili</button>
-      </div>
-    `;
+      <div class="ref-line"><div><strong>Reference ID</strong>${escapeHtml(referenceId || '–')}</div>
+        <button class="copy-btn" onclick="copyText('${escapeAttr(referenceId)}', this)">Nakili</button></div>
+      <div class="ref-line" style="margin-top:8px;"><div><strong>Internal Reference</strong>${escapeHtml(internalReference || '–')}</div>
+        <button class="copy-btn" onclick="copyText('${escapeAttr(internalReference)}', this)">Nakili</button></div>`;
   }
 
   async function copyText(text, btn) {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      // fallback for older/insecure contexts
+    try { await navigator.clipboard.writeText(text); }
+    catch {
       const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
       try { document.execCommand('copy'); } catch {}
       document.body.removeChild(ta);
     }
@@ -1166,9 +1004,8 @@
     setTimeout(() => { btn.textContent = 'Nakili'; btn.classList.remove('copied'); }, 1600);
   }
 
-  // ─── HELPERS ─────────────────────────────────────────────
   function escapeHtml(str) {
-    return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&','<':'<','>':'>','"':'"',"'":'&#39;'}[c]));
   }
   function escapeAttr(str) {
     return String(str ?? '').replace(/'/g, "\\'");
@@ -1187,7 +1024,6 @@
     document.getElementById(id).classList.remove('show');
   }
 
-  // ─── INIT ────────────────────────────────────────────────
   refreshConnectionStatus();
 </script>
 
