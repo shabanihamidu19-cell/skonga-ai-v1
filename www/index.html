@@ -1232,7 +1232,7 @@ getRedirectResult(auth).catch(()=>{});
     <div class="sheet-handle"></div>
     <div class="sheet-hdr">
       <span class="sheet-title">SETTINGS</span>
-      <button class="sheet-close" id="settingsClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="sheet-close" id="settingsClose" onclick="closeSettings()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
     <!-- Appearance -->
@@ -1312,7 +1312,7 @@ getRedirectResult(auth).catch(()=>{});
     <div class="sheet-handle"></div>
     <div class="sheet-hdr">
       <span class="sheet-title" id="profileSheetTitle">ACCOUNT</span>
-      <button class="sheet-close" id="profileClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="sheet-close" id="profileClose" onclick="closeProfile()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="auth-body">
 
@@ -1732,15 +1732,19 @@ function resizeImageIfNeeded(dataUrl, maxPx, quality){
       const el = document.getElementById(id);
       if(el && !el.classList.contains('hidden')){ el.classList.add('hidden'); return; }
     }
-    const sheets = ['profileSheet','settingsSheet'];
+    const sheets = ['paySheet','legalSheet','profileSheet','settingsSheet'];
     for(const id of sheets){
       const el = document.getElementById(id);
       if(el && !el.classList.contains('hidden')){
-        if(id === 'profileSheet') closeProfile?.();
-        else if(id === 'settingsSheet') closeSettings?.();
+        if(id === 'paySheet'){ if(typeof closeSkongaPay==='function') closeSkongaPay(); else el.classList.add('hidden'); }
+        else if(id === 'legalSheet'){ if(typeof closeLegalModal==='function') closeLegalModal(); else el.classList.add('hidden'); }
+        else if(id === 'profileSheet'){ if(typeof closeProfile==='function') closeProfile(); else el.classList.add('hidden'); }
+        else if(id === 'settingsSheet'){ if(typeof closeSettings==='function') closeSettings(); else el.classList.add('hidden'); }
         return;
       }
     }
+    const sb = document.getElementById('sidebar');
+    if(sb && sb.classList.contains('open')){ if(typeof closeSidebar==='function') closeSidebar(); else sb.classList.remove('open'); return; }
     // If on a sub-tab (Notes, Library, History), go back to Chat
     const activeTab = document.querySelector('.tab-btn.active');
     if(activeTab && activeTab.dataset.tab !== 'chat'){
@@ -4187,8 +4191,10 @@ renderHistList();
 let currentUser = null; // {name, email, level, method, joinDate}
 
 function openProfile(){
-  updateProfileView();
-  $('profileSheet').classList.remove('hidden');
+  const sheet = $('profileSheet');
+  if(!sheet){ try{ showToast('Profile unavailable.', true); }catch(e){} return; }
+  try{ updateProfileView(); }catch(err){ console.error('updateProfileView', err); }
+  sheet.classList.remove('hidden');
 }
 function closeProfile(){
   $('profileSheet').classList.add('hidden');
@@ -4210,32 +4216,34 @@ function switchAuthTab(tab){
 
 function updateProfileView(){
   if(currentUser){
-    $('authView').style.display='none';
-    $('profileView').style.display='block';
-    $('profileSheetTitle').textContent='PROFILE';
+    if($('authView')) $('authView').style.display='none';
+    if($('profileView')) $('profileView').style.display='block';
+    if($('profileSheetTitle')) $('profileSheetTitle').textContent='PROFILE';
 
-    /* Avatar — photo (Google) or initials */
-    const initials = currentUser.name.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
-    if(currentUser.photo){
-      $('profileAvatar').innerHTML = `<img src="${currentUser.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentNode.textContent='${initials}'"/>`;
-    } else {
-      $('profileAvatar').textContent = initials;
+    const initials = (currentUser.name||'?').trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2) || '?';
+    const pa = $('profileAvatar');
+    if(pa){
+      if(currentUser.photo){
+        pa.innerHTML = `<img src="${currentUser.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentNode.textContent='${initials}'"/>`;
+      } else {
+        pa.textContent = initials;
+      }
     }
     const _ha=$('headerAvatar'); if(_ha) _ha.textContent = initials;
 
-    $('profileName').textContent  = currentUser.name;
-    $('profileEmail').textContent = currentUser.email;
-    $('profileLevel').textContent = currentUser.levelLabel || '—';
-    $('profileMethod').textContent= currentUser.method === 'google' ? '🔵 Google' : '🔐 Email';
-    $('statChats').textContent    = chatSessions.length;
-    $('statNotes').textContent    = notes.length;
-    const days = Math.max(1, Math.floor((Date.now()-currentUser.joinDate)/(86400000))+1);
-    $('statDays').textContent = days;
+    if($('profileName')) $('profileName').textContent  = currentUser.name || '';
+    if($('profileEmail')) $('profileEmail').textContent = currentUser.email || '';
+    if($('profileLevel')) $('profileLevel').textContent = currentUser.levelLabel || '—';
+    if($('profileMethod')) $('profileMethod').textContent= currentUser.method === 'google' ? 'Google' : 'Email';
+    if($('statChats')) $('statChats').textContent    = (typeof chatSessions!=='undefined' ? chatSessions.length : 0);
+    if($('statNotes')) $('statNotes').textContent    = (typeof notes!=='undefined' ? notes.length : 0);
+    const days = Math.max(1, Math.floor((Date.now()-(currentUser.joinDate||Date.now()))/(86400000))+1);
+    if($('statDays')) $('statDays').textContent = days;
   } else {
-    $('authView').style.display='block';
-    $('profileView').style.display='none';
-    $('profileSheetTitle').textContent='ACCOUNT';
-    $('headerAvatar').textContent='?';
+    if($('authView')) $('authView').style.display='block';
+    if($('profileView')) $('profileView').style.display='none';
+    if($('profileSheetTitle')) $('profileSheetTitle').textContent='ACCOUNT';
+    const _ha2=$('headerAvatar'); if(_ha2) _ha2.textContent='?';
   }
 }
 
@@ -4479,8 +4487,11 @@ function openSkongaPay(){
   $('paySheet').classList.remove('hidden');
 }
 function closeSkongaPay(){
-  $('paySheet').classList.add('hidden');
+  const el = document.getElementById('paySheet');
+  if(el) el.classList.add('hidden');
 }
+window.closeSkongaPay = closeSkongaPay;
+
 function payShowStep(id){
   document.querySelectorAll('#paySheet .pay-step').forEach(s=>s.classList.remove('active'));
   const el = $(id);
@@ -4628,7 +4639,7 @@ async function openExternalLegal(kind){
       if(typeof updateProfileView==='function') updateProfileView();
       const sheet=$('profileSheet');
       if(sheet) sheet.classList.remove('hidden');
-    }catch(err){ console.error('openProfile', err); try{ showToast('Profile haikufunguka. Jaribu tena.', true);}catch(_){} }
+    }catch(err){ console.error('openProfile', err); try{ showToast('Could not fully load profile.', true);}catch(_){} }
   }
   function safeOpenSettings(e){
     try{ if(e) e.preventDefault(); }catch(_){}
@@ -4709,6 +4720,51 @@ function updateWelcomeGreeting(){
 document.addEventListener('DOMContentLoaded', function(){ try{ updateWelcomeGreeting(); }catch(e){} });
 try{ updateWelcomeGreeting(); }catch(e){}
 
+
+/* PROFILE_FIX_V2 */
+
+function safeOpenProfile(e){
+  try{ if(e) e.preventDefault(); }catch(_){}
+  try{ if(typeof closeSidebar==='function') closeSidebar(); }catch(_){}
+  const sheet = document.getElementById('profileSheet') || (typeof $==='function' ? $('profileSheet') : null);
+  if(!sheet){ try{ showToast('Profile unavailable.', true); }catch(_){} return; }
+  try{ if(typeof updateProfileView==='function') updateProfileView(); }catch(err){ console.error('updateProfileView', err); }
+  sheet.classList.remove('hidden');
+}
+window.openProfile = safeOpenProfile;
+
+(function(){
+  ['sidebarProfileBtn','profileBtn'].forEach(function(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.onclick = null;
+    el.addEventListener('click', function(ev){ safeOpenProfile(ev); });
+  });
+})();
+
+
+/* PANELS_CLOSE_FIX */
+(function(){
+  function bindCloses(){
+    const pairs = [
+      ['payClose','closeSkongaPay'],
+      ['legalClose','closeLegalModal'],
+      ['settingsClose','closeSettings'],
+      ['profileClose','closeProfile']
+    ];
+    pairs.forEach(([id, name])=>{
+      const el = document.getElementById(id);
+      const fn = window[name];
+      if(!el || typeof fn!=='function') return;
+      el.onclick = function(e){ try{e.preventDefault();e.stopPropagation();}catch(_){} fn(); };
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bindCloses);
+  else bindCloses();
+  setTimeout(bindCloses, 0);
+  setTimeout(bindCloses, 400);
+})();
+
 </script>
 
 <!-- ═══ PAY SHEET (in-app — no full-page restart) ═══ -->
@@ -4764,7 +4820,7 @@ try{ updateWelcomeGreeting(); }catch(e){}
     <div class="sheet-handle"></div>
     <div class="sheet-hdr">
       <span class="sheet-title" id="legalTitle">Masharti</span>
-      <button class="sheet-close" id="legalClose" aria-label="Funga"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="sheet-close" id="legalClose" aria-label="Funga" onclick="closeLegalModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="legal-body" id="legalBody"></div>
   </div>
