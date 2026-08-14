@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "907249107855",
+    "project_id": "skonga-ai-ddfc9",
+    "storage_bucket": "skonga-ai-ddfc9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907249107855:android:PLACEHOLDER_REGISTER_ANDROID_IN_FIREBASE",
+        "android_client_info": {
+          "package_name": "tz.co.kclplatform.skonga"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEUstmycExFobMi4abvxluyGMNRGDyabs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
