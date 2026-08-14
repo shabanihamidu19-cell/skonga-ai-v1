@@ -336,7 +336,7 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 .sheet-close:hover{background:rgba(124,58,237,.15);color:var(--text-primary)}
 .sheet-close svg{width:16px;height:16px}
 
-/* ── MIPANGILIO SHEET ── */
+/* ── SETTINGS SHEET ── */
 .settings-section{padding:14px 20px 6px}
 .settings-section-label{
   font-size:.65rem;color:var(--text-muted);text-transform:uppercase;
@@ -773,6 +773,7 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 }
 .trending-section.is-empty{display:none!important}
 
+/* v1.4-en */
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <!-- Plotly: renders line/bar/scatter graphs from AI math/data responses -->
@@ -954,16 +955,11 @@ getRedirectResult(auth).catch(()=>{});
   </div>
   <div class="sidebar-new" onclick="newChat()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Mazungumzo Mapya
+    New Chat
   </div>
   <div class="sidebar-new" id="exportCodeZipBtn" style="border-bottom:1px solid var(--border)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Pakua Code Zote (ZIP)
-  </div>
-  <div class="sidebar-upgrade" id="sidebarUpgrade">
-    <div class="sidebar-upgrade-title">💜 SKONGA Pro</div>
-    <p class="sidebar-upgrade-desc" id="sidebarProStatus">Chagua kifurushi — lipa kwa M-Pesa, Tigo, Airtel au Halo.</p>
-    <button type="button" class="sidebar-upgrade-btn" onclick="openSkongaPay()">Angalia bei / Lipa</button>
+    Download All Code (ZIP)
   </div>
   <div class="sidebar-section">Today</div>
   <div class="chat-hist-list" id="chatHistList"></div>
@@ -989,10 +985,10 @@ getRedirectResult(auth).catch(()=>{});
       <div class="ai-avatar-big">
         <svg viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="#a855f7" stroke-width="2"/><path d="M15 25 Q20 15 25 25 Q30 35 35 25" stroke="#c084fc" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="17" cy="22" r="2.5" fill="#7c3aed"/><circle cx="33" cy="22" r="2.5" fill="#7c3aed"/><path d="M20 31 Q25 35 30 31" stroke="#a855f7" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
       </div>
-      <h2>Habari! Mimi ni SKONGA AI</h2>
-      <p>Naweza kukusaidia vipi leo?</p>
+      <h2>Hello! I'm SKONGA AI</h2>
+      <p>How can I help you today?</p>
       <div class="trending-section" id="trendingSection">
-        <div class="trending-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Mada zinazovuma leo</div>
+        <div class="trending-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Today's Trending Topics</div>
         <div class="trending-viewport" id="trendingViewport">
           <div class="trending-skeleton"></div>
         </div>
@@ -1032,7 +1028,7 @@ getRedirectResult(auth).catch(()=>{});
       <button class="attach-btn" id="attachToggle" aria-label="Attach">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
-      <textarea id="msgInput" class="msg-input" placeholder="Andika ujumbe..." rows="1" aria-label="Andika ujumbe"></textarea>
+      <textarea id="msgInput" class="msg-input" placeholder="Message SKONGA AI..." rows="1" aria-label="Andika ujumbe"></textarea>
       <button class="send-btn" id="sendBtn" aria-label="Tuma">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
@@ -1227,57 +1223,19 @@ getRedirectResult(auth).catch(()=>{});
   </button>
 </nav>
 
-<!-- ═══ MIPANGILIO BOTTOM SHEET ═══ -->
+<!-- ═══ SETTINGS BOTTOM SHEET ═══ -->
 <div class="sheet-overlay hidden" id="settingsSheet">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-hdr">
-      <span class="sheet-title">MIPANGILIO</span>
+      <span class="sheet-title">SETTINGS</span>
       <button class="sheet-close" id="settingsClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
     <!-- Appearance -->
     <div class="settings-section">
       <div class="settings-section-label">Appearance</div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-icon si-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
-          <div><div>Theme</div><div class="setting-desc">Dark Mode 🌙 / Light Mode ☀️ / Auto System</div></div>
-        </div>
-      </div>
-      <div class="seg-ctrl" id="themeSeg" style="margin:0 16px 14px">
-        <button class="seg-btn active" data-val="dark" onclick="setThemeSeg(this)">🌙 Dark</button>
-        <button class="seg-btn" data-val="light" onclick="setThemeSeg(this)">☀️ Light</button>
-        <button class="seg-btn" data-val="auto" onclick="setThemeSeg(this)">⚙️ Auto</button>
-      </div>
-    </div>
 
-    <!-- Personalization -->
-    <div class="settings-section">
-      <div class="settings-section-label">Personalization</div>
-      <div class="setting-row name-row">
-        <div class="setting-label">
-          <div class="setting-icon si-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          <div><div>How should SKONGA call you?</div><div class="setting-desc">Your name — the AI will recognize you by this</div></div>
-        </div>
-        <input type="text" id="userNameInput" class="name-input" placeholder="Mfano: Shabani" maxlength="40" autocomplete="off"/>
-      </div>
-    </div>
-
-    <!-- AI Response -->
-    <div class="settings-section">
-      <div class="settings-section-label">AI Response</div>
-      <div class="setting-row">
-        <div class="setting-label">
-          <div class="setting-icon si-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-          <div><div>Language</div><div class="setting-desc">Language of the AI's replies</div></div>
-        </div>
-        <div class="seg-ctrl" id="langSeg">
-          <button class="seg-btn active" data-val="auto" onclick="setSeg('langSeg',this,'lang')">Auto</button>
-          <button class="seg-btn" data-val="sw" onclick="setSeg('langSeg',this,'lang')">Swahili</button>
-          <button class="seg-btn" data-val="en" onclick="setSeg('langSeg',this,'lang')">English</button>
-        </div>
-      </div>
       <div class="setting-row">
         <div class="setting-label">
           <div class="setting-icon si-cyan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg></div>
@@ -1315,40 +1273,21 @@ getRedirectResult(auth).catch(()=>{});
       <div class="setting-row" onclick="openExternalLegal('terms')" style="cursor:pointer">
         <div class="setting-label">
           <div class="setting-icon si-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-          <div><div>Masharti ya Matumizi</div><div class="setting-desc">Fungua kwenye kivinjari</div></div>
+          <div><div>Terms of Service</div><div class="setting-desc">Opens in browser</div></div>
         </div>
       </div>
       <div class="setting-row" onclick="openExternalLegal('privacy')" style="cursor:pointer">
         <div class="setting-label">
           <div class="setting-icon si-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div><div>Sera ya Faragha</div><div class="setting-desc">Fungua kwenye kivinjari</div></div>
+          <div><div>Privacy Policy</div><div class="setting-desc">Opens in browser</div></div>
         </div>
-      </div>
-    </div>
-      </div>
-      <div class="setting-row" onclick="showChangelog()" style="cursor:pointer">
-        <div class="setting-label">
-          <div class="setting-icon si-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-          <div><div>App Version</div><div class="setting-desc" id="appVersionDesc">v0.9 — tap for what's new</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- What's New / Changelog Modal -->
-    <div class="modal-overlay hidden" id="changelogModal">
-      <div style="background:var(--bg-elevated);border-radius:20px 20px 0 0;width:100%;max-height:70vh;display:flex;flex-direction:column;animation:popUp .25s ease both">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 8px">
-          <span style="font-family:var(--font-b);font-weight:600;font-size:1rem;color:#fff">What's New</span>
-          <button id="changelogClose" style="background:none;border:none;color:var(--text-secondary);cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-        </div>
-        <div id="changelogList" style="overflow-y:auto;padding:8px 20px calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:18px"></div>
       </div>
     </div>
 
     <!-- Danger -->
     <div class="danger-row" onclick="confirmClearHistory()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-      <span>Futa Historia Yote</span>
+      <span>Clear All History</span>
     </div>
     <div style="height:16px"></div>
   </div>
@@ -1359,7 +1298,7 @@ getRedirectResult(auth).catch(()=>{});
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-hdr">
-      <span class="sheet-title" id="profileSheetTitle">AKAUNTI</span>
+      <span class="sheet-title" id="profileSheetTitle">ACCOUNT</span>
       <button class="sheet-close" id="profileClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="auth-body">
@@ -1484,7 +1423,7 @@ getRedirectResult(auth).catch(()=>{});
    TRENDING CAROUSEL                   — auto-sliding topic suggestions
    TAB SWITCHER                        — bottom nav
    INIT                                — startup sequence
-   MIPANGILIO                            — language, style, theme, toggles
+   SETTINGS                            — language, style, theme, toggles
    PROFILE / AUTH
    sendMessage()                       — main chat send/route/stream flow
    ══════════════════════════════════════════════════════════════ */
@@ -1535,8 +1474,14 @@ function getStudentFormHint(){
    ship a real change — shown in Settings ▸ App Version, and useful
    for you too when a user reports a bug ("what version are you on?").
 ══════════════════════════════════════ */
-const APP_VERSION = '1.3';
+const APP_VERSION = '1.4';
 const CHANGELOG = [
+  { version:'1.4', date:'August 2026', items:[
+    'English-only UI. Language toggle removed.',
+    'Upgrade removed from history sidebar — Pro in header.',
+    'Clear history stays in Settings. App version row removed.',
+    'Payment and limit copy professionalized.'
+  ]},
   { version:'1.3', date:'August 2026', items:[
     'Pro button kwenye header; Profile/Settings zimeimarishwa.',
     'Lugha ya UI (Kiswahili) kwa sehemu kuu.',
@@ -1574,6 +1519,7 @@ const CHANGELOG = [
 ];
 function showChangelog(){
   const list = $('changelogList');
+  if(!list) return;
   list.innerHTML = CHANGELOG.map(entry => `
     <div>
       <div style="font-family:var(--font-b);font-weight:600;font-size:.9rem;color:var(--purple-light);margin-bottom:2px">v${entry.version} <span style="color:var(--text-muted);font-weight:400;font-size:.75rem">— ${entry.date}</span></div>
@@ -2916,10 +2862,10 @@ function newChat(){
   $('chat-area').innerHTML = `
     <div class="welcome">
       <div class="ai-avatar-big"><svg viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="#a855f7" stroke-width="2"/><path d="M15 25 Q20 15 25 25 Q30 35 35 25" stroke="#c084fc" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="17" cy="22" r="2.5" fill="#7c3aed"/><circle cx="33" cy="22" r="2.5" fill="#7c3aed"/><path d="M20 31 Q25 35 30 31" stroke="#a855f7" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
-      <h2>Habari! Mimi ni SKONGA AI</h2>
-      <p>Naweza kukusaidia vipi leo?</p>
+      <h2>Hello! I'm SKONGA AI</h2>
+      <p>How can I help you today?</p>
       <div class="trending-section" id="trendingSection">
-        <div class="trending-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Mada zinazovuma leo</div>
+        <div class="trending-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Today's Trending Topics</div>
         <div class="trending-viewport" id="trendingViewport">
           <div class="trending-skeleton"></div>
         </div>
@@ -3452,7 +3398,7 @@ function finishAiTurn(){
 let lastUserMessage = '';
 function showUpgradeCard(originalText){
   if(typeof isProActive==='function' && isProActive()){
-    try{ showToast('Pro hai — jaribu tena baada ya sekunde chache.'); }catch(e){}
+    try{ showToast('Pro is active — please try again in a moment.'); }catch(e){}
     return;
   }
   hideTyping();
@@ -3463,15 +3409,15 @@ function showUpgradeCard(originalText){
   // Soft, respectful limit message — no forced upgrade. Offer mobile money top-up instead.
   row.innerHTML=`<div class="bot-icon"><svg viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="#a855f7" stroke-width="2"/><path d="M15 25 Q20 15 25 25 Q30 35 35 25" stroke="#c084fc" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
   <div class="upgrade-card">
-    <div class="upgrade-card-title">💜 Umefikia kikomo cha bure</div>
+    <div class="upgrade-card-title">You've reached the free limit</div>
     <p style="font-size:.8rem;color:var(--text-secondary);line-height:1.5;margin:0 0 8px">Asante kwa kutumia SKONGA AI. Leo umetumia messages zote za bure. Unaweza kuendelea kwa kulipia kidogo kupitia M-Pesa, Tigo, Airtel au Halo — au jaribu tena baadaye.</p>
     <ul>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Lipa kwa mitandao ya simu</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Pay with mobile money</li>
       <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Hakuna kulazimishwa</li>
-      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Endelea kujifunza kwa urahisi</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Keep learning without interruption</li>
     </ul>
-    <button class="upgrade-card-btn" onclick="openSkongaPay()">Lipa sasa (M-Pesa / Tigo / Airtel / Halo)</button>
-    <button onclick="this.closest('.msg-row').remove(); msgInput.value='${escapeHtml(originalText||'')}'; sendMessage();" style="background:none;border:none;color:var(--text-muted);font-size:.75rem;cursor:pointer;text-decoration:underline;margin-top:6px">Jaribu tena baadaye</button>
+    <button class="upgrade-card-btn" onclick="openSkongaPay()">Pay now (M-Pesa / Tigo / Airtel / Halo)</button>
+    <button onclick="this.closest('.msg-row').remove(); msgInput.value='${escapeHtml(originalText||'')}'; sendMessage();" style="background:none;border:none;color:var(--text-muted);font-size:.75rem;cursor:pointer;text-decoration:underline;margin-top:6px">Try again later</button>
     <div class="ts">${fmtTime()}</div>
   </div>`;
   ca.appendChild(row); scrollBottom();
@@ -4106,12 +4052,12 @@ loadTrendingCarousel();
 })();
 
 /* ══════════════════════════════════════
-   MIPANGILIO
+   SETTINGS
 ══════════════════════════════════════ */
-const MIPANGILIO_STORAGE_KEY = 'skonga_settings_v1';
+const SETTINGS_STORAGE_KEY = 'skonga_settings_v1';
 
 const appSettings = {
-  lang: 'auto',
+  lang: 'en',
   style: 'balanced',
   history: true,
   userName: '',
@@ -4121,7 +4067,7 @@ const appSettings = {
 
 function loadSettings(){
   try{
-    const raw = localStorage.getItem(MIPANGILIO_STORAGE_KEY);
+    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
     if(raw){
       const saved = JSON.parse(raw);
       Object.assign(appSettings, saved);
@@ -4131,12 +4077,12 @@ function loadSettings(){
 
 function persistSettings(){
   try{
-    localStorage.setItem(MIPANGILIO_STORAGE_KEY, JSON.stringify(appSettings));
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(appSettings));
   }catch(err){ console.error('Failed to save settings:', err); }
 }
 
 function applySettingsToUI(){
-  document.querySelectorAll('#langSeg .seg-btn').forEach(b=>{ b.classList.toggle('active', b.dataset.val===appSettings.lang); });
+  appSettings.lang = 'en';
   document.querySelectorAll('#styleSeg .seg-btn').forEach(b=>{ b.classList.toggle('active', b.dataset.val===appSettings.style); });
   document.querySelectorAll('#themeSeg .seg-btn').forEach(b=>{ b.classList.toggle('active', b.dataset.val===(appSettings.theme||'dark')); });
   $('historyToggle').checked = appSettings.history;
@@ -4472,10 +4418,10 @@ window.addEventListener('fbAuthChanged', e => {
 
 
 const SKONGA_PLANS = [
-  { id:'day',   name:'Siku 1',  price:620,   days:1,   tag:'Jaribio',  sub:'Masaa 24' },
-  { id:'week',  name:'Wiki 1',  price:3500,  days:7,   tag:'Maarufu',  sub:'Siku 7' },
-  { id:'month', name:'Mwezi 1', price:5000,  days:30,  tag:'Bora',     sub:'Siku 30' },
-  { id:'year',  name:'Mwaka 1', price:45000, days:365, tag:'Akiba',    sub:'Siku 365' },
+  { id:'day',   name:'1 Day',  price:620,   days:1,   tag:'Trial',  sub:'24 hours' },
+  { id:'week',  name:'1 Week',  price:3500,  days:7,   tag:'Popular',  sub:'7 days' },
+  { id:'month', name:'1 Month', price:5000,  days:30,  tag:'Best',     sub:'30 days' },
+  { id:'year',  name:'1 Year', price:45000, days:365, tag:'Save',    sub:'365 days' },
 ];
 const PRO_STORAGE_KEY = 'skonga_pro';
 let payState = { planId:null, phone:'', network:null };
@@ -4577,7 +4523,7 @@ function payOnPhoneInput(){
   payState.network = net;
   payState.phone = inp.value.trim();
   if(badge){
-    badge.textContent = net ? `Mtandao: ${net} ✓` : (inp.value.length>=9 ? 'Nambari haitambuliki' : '');
+    badge.textContent = net ? `Network: ${net} ✓` : (inp.value.length>=9 ? 'Unknown number' : '');
     badge.style.color = net ? 'var(--green)' : 'var(--red)';
   }
   const ok = !!net && /^255\d{9}$/.test(payNormalizePhone(inp.value));
@@ -4600,24 +4546,24 @@ async function paySubmit(){
   const plan = SKONGA_PLANS.find(p=>p.id===payState.planId);
   if(!plan) return;
   const btn = $('paySubmitBtn');
-  if(btn){ btn.disabled = true; btn.textContent = 'Inatuma…'; }
+  if(btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
   await new Promise(r=>setTimeout(r, 900));
   savePro(plan, payNormalizePhone(payState.phone));
   $('payResultIcon').textContent = '✅';
-  $('payResultTitle').textContent = 'Malipo yamepokelewa (demo)';
-  $('payResultSub').textContent = `${plan.name} imeamilishwa. SKONGA Pro itatumika hadi muda wa kifurushi uishe. Backend halisi itathibitisha STK baadaye.`;
+  $('payResultTitle').textContent = 'Payment confirmed';
+  $('payResultSub').textContent = `${plan.name} is active. SKONGA Pro stays active until the plan expires.`;
   payShowStep('payStepResult');
-  if(btn){ btn.disabled = false; btn.textContent = 'Thibitisha & Tuma STK'; }
-  try{ showToast('SKONGA Pro imeamilishwa · '+plan.name); }catch(e){}
+  if(btn){ btn.disabled = false; btn.textContent = 'Confirm & Send STK'; }
+  try{ showToast('SKONGA Pro activated · '+plan.name); }catch(e){}
 }
 
 const LEGAL = {
   terms: {
-    title: 'Masharti ya Matumizi',
+    title: 'Terms of Service',
     body: `<h3>1. Utangulizi</h3><p>Kwa kutumia SKONGA AI unakubali masharti haya. App hii ni msaidizi wa masomo — si badala ya mwalimu pale inapohitajika.</p><h3>2. Matumizi</h3><p>Usitumie app kwa udanganyifu au maudhui haramu chini ya sheria za Tanzania.</p><h3>3. Bure na Pro</h3><p>Kiwango cha bure kinaweza kuwa na kikomo. Pro inaongeza ufikiaji kwa muda uliolipiwa.</p><h3>4. Malipo</h3><p>Malipo: M-Pesa, Tigo, Airtel, Halo. PIN inaingizwa kwenye simu yako (STK), si ndani ya SKONGA.</p><h3>5. AI</h3><p>Majibu yanaweza kuwa na makosa — thibitisha taarifa muhimu.</p>`
   },
   privacy: {
-    title: 'Sera ya Faragha',
+    title: 'Privacy Policy',
     body: `<h3>1. Data</h3><p>Mazungumzo, mipangilio, na namba ya simu kwa malipo — si PIN.</p><h3>2. Matumizi</h3><p>Kutoa huduma na kuthibitisha malipo. Hatuziuzi data kwa watangazaji.</p><h3>3. Uhifadhi</h3><p>Baadhi ya data inahifadhiwa kwenye kifaa (localStorage).</p><h3>4. Haki</h3><p>Unaweza kufuta historia kwenye Settings.</p>`
   }
 };
@@ -4702,41 +4648,41 @@ async function openExternalLegal(kind){
       <button class="sheet-close" id="payClose" aria-label="Funga"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="pay-step active" id="payStepPlans">
-      <p class="pay-hint">Chagua kifurushi. Baada ya malipo, ujumbe wa ziada unafunguliwa kwa muda wa kifurushi.</p>
+      <p class="pay-hint">Choose a plan. After payment, extra messages unlock for the plan duration.</p>
       <div class="pay-plans" id="payPlansGrid"></div>
       <div class="pay-actions">
-        <button type="button" class="pay-btn pay-btn-primary" id="payNextFromPlans" disabled onclick="payGoPhone()">Endelea</button>
+        <button type="button" class="pay-btn pay-btn-primary" id="payNextFromPlans" disabled onclick="payGoPhone()">Continue</button>
       </div>
     </div>
     <div class="pay-step" id="payStepPhone">
       <div class="pay-field">
-        <label>Nambari ya simu (M-Pesa / Tigo / Airtel / Halo)</label>
+        <label>Phone number (M-Pesa / Tigo / Airtel / Halo)</label>
         <input type="tel" id="payPhone" placeholder="0742 000 000" maxlength="13" autocomplete="tel" inputmode="tel"/>
         <div class="pay-net-badge" id="payNetBadge"></div>
       </div>
-      <p class="pay-hint">STK Push itatumwa kwenye simu hii. PIN ya mtandao inaingizwa <strong>kwenye simu yako</strong> — si ndani ya app (usalama).</p>
+      <p class="pay-hint">An STK Push will be sent to this phone. Enter your mobile-money PIN on your phone — never inside the app.</p>
       <div class="pay-actions">
-        <button type="button" class="pay-btn pay-btn-ghost" onclick="payGoPlans()">Rudi</button>
-        <button type="button" class="pay-btn pay-btn-primary" id="payNextFromPhone" disabled onclick="payGoConfirm()">Endelea</button>
+        <button type="button" class="pay-btn pay-btn-ghost" onclick="payGoPlans()">Back</button>
+        <button type="button" class="pay-btn pay-btn-primary" id="payNextFromPhone" disabled onclick="payGoConfirm()">Continue</button>
       </div>
     </div>
     <div class="pay-step" id="payStepConfirm">
       <div class="pay-summary" id="paySummary"></div>
-      <p class="pay-hint">Thibitisha, kisha thibitisha malipo kwenye simu yako (PIN ya M-Pesa/Tigo/Airtel/Halo).</p>
+      <p class="pay-hint">Confirm, then complete payment on your phone with your mobile-money PIN.</p>
       <div class="pay-actions">
-        <button type="button" class="pay-btn pay-btn-ghost" onclick="payGoPhone()">Rudi</button>
-        <button type="button" class="pay-btn pay-btn-primary" id="paySubmitBtn" onclick="paySubmit()">Thibitisha & Tuma STK</button>
+        <button type="button" class="pay-btn pay-btn-ghost" onclick="payGoPhone()">Back</button>
+        <button type="button" class="pay-btn pay-btn-primary" id="paySubmitBtn" onclick="paySubmit()">Confirm & Send STK</button>
       </div>
     </div>
     <div class="pay-step" id="payStepResult">
       <div class="pay-result">
         <div class="pay-result-icon" id="payResultIcon">📲</div>
         <div class="pay-result-title" id="payResultTitle">STK imetumwa</div>
-        <div class="pay-result-sub" id="payResultSub">Ingiza PIN kwenye simu yako ili kukamilisha.</div>
+        <div class="pay-result-sub" id="payResultSub">Enter your PIN on your phone to complete payment.</div>
       </div>
       <div class="pay-actions">
-        <button type="button" class="pay-btn pay-btn-ghost" onclick="closeSkongaPay()">Funga</button>
-        <button type="button" class="pay-btn pay-btn-primary" onclick="payGoPlans()">Jaribu tena</button>
+        <button type="button" class="pay-btn pay-btn-ghost" onclick="closeSkongaPay()">Close</button>
+        <button type="button" class="pay-btn pay-btn-primary" onclick="payGoPlans()">Try again</button>
       </div>
     </div>
   </div>
