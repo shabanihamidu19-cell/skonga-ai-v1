@@ -336,7 +336,7 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 .sheet-close:hover{background:rgba(124,58,237,.15);color:var(--text-primary)}
 .sheet-close svg{width:16px;height:16px}
 
-/* ── SETTINGS SHEET ── */
+/* ── MIPANGILIO SHEET ── */
 .settings-section{padding:14px 20px 6px}
 .settings-section-label{
   font-size:.65rem;color:var(--text-muted);text-transform:uppercase;
@@ -753,6 +753,26 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 .legal-body h3{color:var(--text-primary);font-size:.88rem;margin:14px 0 6px}
 .legal-body p{margin-bottom:8px}
 
+
+/* v1.3-stable */
+.sheet-overlay{
+  position:fixed!important;inset:0!important;left:0;right:0;top:0;bottom:0;
+  max-width:430px;margin:0 auto;z-index:200!important;
+}
+.sheet-overlay.hidden{display:none!important;pointer-events:none!important}
+.danger-row{position:relative;z-index:1}
+.hbtn-pro{
+  height:34px;padding:0 12px;border-radius:10px;border:1px solid rgba(168,85,247,.4);
+  background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(192,132,252,.15));
+  color:var(--purple-light);font-size:.72rem;font-weight:600;cursor:pointer;
+  font-family:var(--font-b);white-space:nowrap
+}
+.hbtn-pro:active{opacity:.85}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+.trending-section.is-empty{display:none!important}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <!-- Plotly: renders line/bar/scatter graphs from AI math/data responses -->
@@ -919,7 +939,7 @@ getRedirectResult(auth).catch(()=>{});
     <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
     <span class="brand-name">SKONGA <span>AI</span></span>
   </div>
-  <div style="width:40px"></div>
+  <button type="button" class="hbtn-pro" id="headerProBtn" onclick="openSkongaPay()" aria-label="SKONGA Pro">Pro</button>
 </header>
 <div id="offlineBanner">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
@@ -934,11 +954,11 @@ getRedirectResult(auth).catch(()=>{});
   </div>
   <div class="sidebar-new" onclick="newChat()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    New Chat
+    Mazungumzo Mapya
   </div>
   <div class="sidebar-new" id="exportCodeZipBtn" style="border-bottom:1px solid var(--border)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    Download All Code (ZIP)
+    Pakua Code Zote (ZIP)
   </div>
   <div class="sidebar-upgrade" id="sidebarUpgrade">
     <div class="sidebar-upgrade-title">💜 SKONGA Pro</div>
@@ -969,10 +989,10 @@ getRedirectResult(auth).catch(()=>{});
       <div class="ai-avatar-big">
         <svg viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="#a855f7" stroke-width="2"/><path d="M15 25 Q20 15 25 25 Q30 35 35 25" stroke="#c084fc" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="17" cy="22" r="2.5" fill="#7c3aed"/><circle cx="33" cy="22" r="2.5" fill="#7c3aed"/><path d="M20 31 Q25 35 30 31" stroke="#a855f7" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
       </div>
-      <h2>Hello! I'm SKONGA AI</h2>
-      <p>How can I help you today?</p>
+      <h2>Habari! Mimi ni SKONGA AI</h2>
+      <p>Naweza kukusaidia vipi leo?</p>
       <div class="trending-section" id="trendingSection">
-        <div class="trending-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Today's Trending Topics</div>
+        <div class="trending-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Mada zinazovuma leo</div>
         <div class="trending-viewport" id="trendingViewport">
           <div class="trending-skeleton"></div>
         </div>
@@ -1012,7 +1032,7 @@ getRedirectResult(auth).catch(()=>{});
       <button class="attach-btn" id="attachToggle" aria-label="Attach">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </button>
-      <textarea id="msgInput" class="msg-input" placeholder="Message SKONGA AI..." rows="1" aria-label="Andika ujumbe"></textarea>
+      <textarea id="msgInput" class="msg-input" placeholder="Andika ujumbe..." rows="1" aria-label="Andika ujumbe"></textarea>
       <button class="send-btn" id="sendBtn" aria-label="Tuma">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
@@ -1207,12 +1227,12 @@ getRedirectResult(auth).catch(()=>{});
   </button>
 </nav>
 
-<!-- ═══ SETTINGS BOTTOM SHEET ═══ -->
+<!-- ═══ MIPANGILIO BOTTOM SHEET ═══ -->
 <div class="sheet-overlay hidden" id="settingsSheet">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-hdr">
-      <span class="sheet-title">SETTINGS</span>
+      <span class="sheet-title">MIPANGILIO</span>
       <button class="sheet-close" id="settingsClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
 
@@ -1292,16 +1312,16 @@ getRedirectResult(auth).catch(()=>{});
 
         <div class="settings-section">
       <div class="settings-section-label">About & Legal</div>
-      <div class="setting-row" onclick="openLegalModal('terms')" style="cursor:pointer">
+      <div class="setting-row" onclick="openExternalLegal('terms')" style="cursor:pointer">
         <div class="setting-label">
           <div class="setting-icon si-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-          <div><div>Terms of Service</div><div class="setting-desc">Sheria na masharti ya matumizi</div></div>
+          <div><div>Masharti ya Matumizi</div><div class="setting-desc">Fungua kwenye kivinjari</div></div>
         </div>
       </div>
-      <div class="setting-row" onclick="openLegalModal('privacy')" style="cursor:pointer">
+      <div class="setting-row" onclick="openExternalLegal('privacy')" style="cursor:pointer">
         <div class="setting-label">
           <div class="setting-icon si-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div><div>Privacy Policy</div><div class="setting-desc">Jinsi tunavyotunza data yako</div></div>
+          <div><div>Sera ya Faragha</div><div class="setting-desc">Fungua kwenye kivinjari</div></div>
         </div>
       </div>
     </div>
@@ -1328,7 +1348,7 @@ getRedirectResult(auth).catch(()=>{});
     <!-- Danger -->
     <div class="danger-row" onclick="confirmClearHistory()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-      <span>Clear All History</span>
+      <span>Futa Historia Yote</span>
     </div>
     <div style="height:16px"></div>
   </div>
@@ -1339,7 +1359,7 @@ getRedirectResult(auth).catch(()=>{});
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-hdr">
-      <span class="sheet-title" id="profileSheetTitle">ACCOUNT</span>
+      <span class="sheet-title" id="profileSheetTitle">AKAUNTI</span>
       <button class="sheet-close" id="profileClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="auth-body">
@@ -1464,7 +1484,7 @@ getRedirectResult(auth).catch(()=>{});
    TRENDING CAROUSEL                   — auto-sliding topic suggestions
    TAB SWITCHER                        — bottom nav
    INIT                                — startup sequence
-   SETTINGS                            — language, style, theme, toggles
+   MIPANGILIO                            — language, style, theme, toggles
    PROFILE / AUTH
    sendMessage()                       — main chat send/route/stream flow
    ══════════════════════════════════════════════════════════════ */
@@ -1515,8 +1535,14 @@ function getStudentFormHint(){
    ship a real change — shown in Settings ▸ App Version, and useful
    for you too when a user reports a bug ("what version are you on?").
 ══════════════════════════════════════ */
-const APP_VERSION = '1.2';
+const APP_VERSION = '1.3';
 const CHANGELOG = [
+  { version:'1.3', date:'August 2026', items:[
+    'Pro button kwenye header; Profile/Settings zimeimarishwa.',
+    'Lugha ya UI (Kiswahili) kwa sehemu kuu.',
+    'Terms/Privacy zinafunguka kwenye kivinjari.',
+    'Trending haibaki skeleton; sheets fixed.'
+  ]},
   { version:'1.2', date:'August 2026', items:[
     'SKONGA Pro plans: Siku 620, Wiki 3,500, Mwezi 5,000, Mwaka 45,000 — in-app pay panel.',
     'Terms of Service & Privacy Policy inside the app.',
@@ -2890,10 +2916,10 @@ function newChat(){
   $('chat-area').innerHTML = `
     <div class="welcome">
       <div class="ai-avatar-big"><svg viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="#a855f7" stroke-width="2"/><path d="M15 25 Q20 15 25 25 Q30 35 35 25" stroke="#c084fc" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="17" cy="22" r="2.5" fill="#7c3aed"/><circle cx="33" cy="22" r="2.5" fill="#7c3aed"/><path d="M20 31 Q25 35 30 31" stroke="#a855f7" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
-      <h2>Hello! I'm SKONGA AI</h2>
-      <p>How can I help you today?</p>
+      <h2>Habari! Mimi ni SKONGA AI</h2>
+      <p>Naweza kukusaidia vipi leo?</p>
       <div class="trending-section" id="trendingSection">
-        <div class="trending-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Today's Trending Topics</div>
+        <div class="trending-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Mada zinazovuma leo</div>
         <div class="trending-viewport" id="trendingViewport">
           <div class="trending-skeleton"></div>
         </div>
@@ -3969,6 +3995,7 @@ async function loadTrendingCarousel(){
     renderTrendingCards(data.cards);
   }catch(err){
     console.warn('[Trending] Backend unavailable — hiding carousel:', err.message||err);
+    const sec=document.getElementById('trendingSection'); if(sec) sec.classList.add('is-empty');
     // Hide carousel completely when backend is down — no fake/placeholder topics
     document.querySelectorAll('[id="trendingSection"]').forEach(el => el.style.display = 'none');
   }
@@ -4079,9 +4106,9 @@ loadTrendingCarousel();
 })();
 
 /* ══════════════════════════════════════
-   SETTINGS
+   MIPANGILIO
 ══════════════════════════════════════ */
-const SETTINGS_STORAGE_KEY = 'skonga_settings_v1';
+const MIPANGILIO_STORAGE_KEY = 'skonga_settings_v1';
 
 const appSettings = {
   lang: 'auto',
@@ -4094,7 +4121,7 @@ const appSettings = {
 
 function loadSettings(){
   try{
-    const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    const raw = localStorage.getItem(MIPANGILIO_STORAGE_KEY);
     if(raw){
       const saved = JSON.parse(raw);
       Object.assign(appSettings, saved);
@@ -4104,7 +4131,7 @@ function loadSettings(){
 
 function persistSettings(){
   try{
-    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(appSettings));
+    localStorage.setItem(MIPANGILIO_STORAGE_KEY, JSON.stringify(appSettings));
   }catch(err){ console.error('Failed to save settings:', err); }
 }
 
@@ -4234,7 +4261,7 @@ function updateProfileView(){
     } else {
       $('profileAvatar').textContent = initials;
     }
-    $('headerAvatar').textContent = initials;
+    const _ha=$('headerAvatar'); if(_ha) _ha.textContent = initials;
 
     $('profileName').textContent  = currentUser.name;
     $('profileEmail').textContent = currentUser.email;
@@ -4614,6 +4641,54 @@ function closeLegalModal(){ $('legalSheet').classList.add('hidden'); }
   const legalSheet = $('legalSheet');
   if(legalSheet) legalSheet.addEventListener('click', e=>{ if(e.target===legalSheet) closeLegalModal(); });
   updateSidebarProStatus();
+})();
+
+
+
+/* v1.3 helpers */
+const EXTERNAL_LEGAL = {
+  terms: 'https://skonga-ai.web.app/terms',
+  privacy: 'https://skonga-ai.web.app/privacy'
+};
+async function openExternalLegal(kind){
+  const url = EXTERNAL_LEGAL[kind] || EXTERNAL_LEGAL.terms;
+  try{
+    if(window.Capacitor?.Plugins?.Browser?.open){
+      await window.Capacitor.Plugins.Browser.open({ url });
+      return;
+    }
+  }catch(e){}
+  try{ window.open(url, '_blank'); }catch(e){ location.href = url; }
+}
+(function(){
+  function safeOpenProfile(e){
+    try{ if(e) e.preventDefault(); }catch(_){}
+    try{ closeSidebar(); }catch(_){}
+    try{
+      if(typeof updateProfileView==='function') updateProfileView();
+      const sheet=$('profileSheet');
+      if(sheet) sheet.classList.remove('hidden');
+    }catch(err){ console.error('openProfile', err); try{ showToast('Profile haikufunguka. Jaribu tena.', true);}catch(_){} }
+  }
+  function safeOpenSettings(e){
+    try{ if(e) e.preventDefault(); }catch(_){}
+    try{ closeSidebar(); }catch(_){}
+    try{
+      const sheet=$('settingsSheet');
+      if(sheet) sheet.classList.remove('hidden');
+    }catch(err){ console.error('openSettings', err); }
+  }
+  window.openProfile = safeOpenProfile;
+  window.openSettings = safeOpenSettings;
+  const pb=$('sidebarProfileBtn'); if(pb){ pb.onclick=null; pb.addEventListener('click', safeOpenProfile); }
+  const sb=$('sidebarSettingsBtn'); if(sb){ sb.onclick=null; sb.addEventListener('click', safeOpenSettings); }
+  setTimeout(function(){
+    const vp=document.getElementById('trendingViewport');
+    const sec=document.getElementById('trendingSection');
+    if(vp && sec && vp.querySelector('.trending-skeleton') && !vp.querySelector('.trending-card')){
+      sec.classList.add('is-empty');
+    }
+  }, 4000);
 })();
 
 </script>
