@@ -70,9 +70,11 @@ header{height:var(--hdr-h);display:flex;align-items:center;justify-content:space
 .panel.active{display:flex}
 
 /* ── CHAT AREA ── */
-#chat-area{flex:1;overflow-y:auto;padding:20px 14px 10px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
-#chat-area::-webkit-scrollbar{width:3px}
+#chat-area{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;padding:20px 14px 10px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;touch-action:pan-y;overscroll-behavior:contain}
+#chat-area::-webkit-scrollbar{width:5px}
 #chat-area::-webkit-scrollbar-thumb{background:var(--purple-mid);border-radius:10px}
+#chat-area .bubble .md-content{max-width:100%}
+#chat-area .bubble .md-content pre{max-height:280px;overflow:auto;-webkit-overflow-scrolling:touch}
 
 .welcome{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 0 8px;animation:fadeDown .6s ease both}
 .ai-avatar-big{width:72px;height:72px;background:radial-gradient(circle at 40% 40%,var(--purple-mid),var(--purple-deep));border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--purple-main);box-shadow:0 0 28px rgba(124,58,237,.45)}
@@ -581,7 +583,7 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 .sources-label svg{width:11px;height:11px}
 .sources-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
 .sources-scroll::-webkit-scrollbar{height:0}
-.source-card{flex-shrink:0;width:148px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:11px;padding:9px 10px;cursor:pointer;transition:background .15s,border-color .15s}
+.source-card{flex-shrink:0;width:148px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:11px;padding:9px 10px;cursor:pointer;transition:background .15s,border-color .15s;text-align:left;font:inherit;color:inherit;display:block;text-decoration:none}
 .source-card:hover,.source-card:active{background:rgba(124,58,237,.1);border-color:var(--purple-mid)}
 .source-card-top{display:flex;align-items:center;gap:6px;margin-bottom:5px}
 .source-icon{width:16px;height:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.6rem;font-weight:700;color:#fff}
@@ -589,6 +591,9 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 .source-icon.wikipedia{background:#000}
 .source-icon.necta{background:#16a34a}
 .source-icon.tamisemi{background:#dc2626}
+.source-icon.curriculum{background:linear-gradient(135deg,#7c3aed,#a855f7)}
+.source-card.curriculum-card{border-color:rgba(124,58,237,.35)}
+.source-card.curriculum-card:hover{border-color:var(--purple-main)}
 .source-domain{font-size:.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .source-title{font-size:.73rem;color:var(--text-primary);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
@@ -2400,16 +2405,66 @@ async function sendFeedback(bubble, actions, type){
 /* ── SOURCE CITATION CARDS (rendered when Live Search is ON) ── */
 function buildSourcesHtml(sources){
   if(!sources || !sources.length) return '';
-  const iconMap={google:'G',wikipedia:'W',necta:'N',tamisemi:'T'};
-  const cards=sources.map(s=>{
-    const kind=(s.kind||'google').toLowerCase();
-    const initial=iconMap[kind]||'?';
-    return `<a class="source-card" href="${s.url||'#'}" target="_blank" rel="noopener noreferrer">
-      <div class="source-card-top"><span class="source-icon ${kind}">${initial}</span><span class="source-domain">${escapeHtml(s.domain||kind)}</span></div>
-      <div class="source-title">${escapeHtml(s.title||'Chanzo')}</div>
+  const iconMap={google:'G',wikipedia:'W',necta:'N',tamisemi:'T',curriculum:'S'};
+  const cards=sources.map((s,i)=>{
+    const kind=(s.kind|| (s.domain==='SKONGA Library' ? 'curriculum' : 'google')).toLowerCase();
+    const initial=iconMap[kind]|| (kind==='curriculum' ? 'S' : '?');
+    const isCurriculum = kind==='curriculum' || (s.domain||'').toLowerCase().includes('skonga');
+    const title = s.title || s.title_en || s.title_sw || 'Chanzo';
+    const meta = [s.subject_name || s.subject, s.form_id ? ('Form '+s.form_id) : (s.form ? ('Form '+s.form) : ''), s.difficulty].filter(Boolean).join(' · ');
+    if(isCurriculum){
+      const payload = encodeURIComponent(JSON.stringify({
+        title, subject: s.subject_name || s.subject || 'SKONGA Library',
+        form: s.form_id || s.form || '', difficulty: s.difficulty || '',
+        topic_id: s.topic_id || ''
+      }));
+      return `<button type=\"button\" class=\"source-card curriculum-card\" data-curriculum=\"${payload}\" onclick=\"openCurriculumSource(this)\">
+      <div class=\"source-card-top\"><span class=\"source-icon curriculum\">${initial}</span><span class=\"source-domain\">SKONGA Library</span></div>
+      <div class=\"source-title\">${escapeHtml(title)}</div>
+      ${meta ? `<div class=\"source-domain\" style=\"margin-top:4px;text-transform:none\">${escapeHtml(meta)}</div>` : ''}
+    </button>`;
+    }
+    const href = (s.url && s.url !== '#') ? s.url : '';
+    if(!href){
+      return `<div class=\"source-card\" style=\"cursor:default\">
+      <div class=\"source-card-top\"><span class=\"source-icon ${kind}\">${initial}</span><span class=\"source-domain\">${escapeHtml(s.domain||kind)}</span></div>
+      <div class=\"source-title\">${escapeHtml(title)}</div>
+    </div>`;
+    }
+    return `<a class=\"source-card\" href=\"${href}\" target=\"_blank\" rel=\"noopener noreferrer\">
+      <div class=\"source-card-top\"><span class=\"source-icon ${kind}\">${initial}</span><span class=\"source-domain\">${escapeHtml(s.domain||kind)}</span></div>
+      <div class=\"source-title\">${escapeHtml(title)}</div>
     </a>`;
   }).join('');
-  return `<div class="sources-block"><div class="sources-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Vyanzo</div><div class="sources-scroll">${cards}</div></div>`;
+  return `<div class=\"sources-block\"><div class=\"sources-label\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><line x1=\"21\" y1=\"21\" x2=\"16.65\" y2=\"16.65\"/></svg>Vyanzo</div><div class=\"sources-scroll\">${cards}</div></div>`;
+}
+
+function openCurriculumSource(el){
+  try{
+    const d = JSON.parse(decodeURIComponent(el.getAttribute('data-curriculum')||'{}'));
+    if(typeof showToast==='function'){
+      showToast((d.title||'SKONGA Library') + (d.subject ? ' · '+d.subject : '') + (d.form ? ' · Form '+d.form : ''), false);
+    }
+    let panel = document.getElementById('curriculum-detail');
+    if(!panel){
+      panel = document.createElement('div');
+      panel.id = 'curriculum-detail';
+      panel.style.cssText = 'position:fixed;left:50%;bottom:90px;transform:translateX(-50%);width:min(92vw,400px);background:var(--bg-elevated);border:1px solid var(--border);border-radius:16px;padding:16px;z-index:80;box-shadow:0 12px 40px rgba(0,0,0,.5)';
+      document.body.appendChild(panel);
+    }
+    panel.innerHTML = `<div style=\"display:flex;justify-content:space-between;align-items:flex-start;gap:12px\">
+      <div>
+        <div style=\"font-size:.7rem;color:var(--purple-light);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px\">SKONGA Library</div>
+        <div style=\"font-size:.95rem;font-weight:600;color:var(--text-primary);line-height:1.35\">${escapeHtml(d.title||'Mada')}</div>
+        <div style=\"font-size:.78rem;color:var(--text-secondary);margin-top:8px;line-height:1.5\">
+          ${d.subject?escapeHtml(d.subject):''}${d.form?' · Form '+escapeHtml(String(d.form)):''}${d.difficulty?' · '+escapeHtml(d.difficulty):''}
+        </div>
+        <div style=\"font-size:.72rem;color:var(--text-muted);margin-top:10px\">Mada hii inatoka kwenye mtaala wa TIE (SKONGA Library).</div>
+      </div>
+      <button type=\"button\" onclick=\"document.getElementById('curriculum-detail').remove()\" style=\"border:none;background:var(--bg-card);color:var(--text-secondary);width:32px;height:32px;border-radius:8px;cursor:pointer;flex-shrink:0\">✕</button>
+    </div>`;
+    setTimeout(()=>{ try{ panel.remove(); }catch(_){} }, 8000);
+  }catch(err){ console.warn(err); }
 }
 
 /* ── STREAM BOT MESSAGE (word-by-word, ChatGPT-style, with optional source cards) ── */
@@ -3071,10 +3126,16 @@ async function handleImageAttachment(dataUrl, name, promptText){
     if(!data.reply) throw new Error('Backend did not return a valid reply');
 
     const citeSources = (data.citations||[]).map(c => ({
-      title: c.title_sw || c.title_en || c.topic_id,
-      url: '#',
+      title: c.title_sw || c.title_en || c.title || c.topic_id,
+      title_en: c.title_en || c.title,
+      title_sw: c.title_sw || c.title,
+      url: (c.url && c.url !== '#') ? c.url : '',
       domain: 'SKONGA Library',
-      kind: 'curriculum'
+      kind: 'curriculum',
+      subject_name: c.subject_name || c.subject || '',
+      form_id: c.form_id || c.form || '',
+      difficulty: c.difficulty || '',
+      topic_id: c.topic_id || ''
     }));
     streamMessage(data.reply, ()=>saveCurrentSession(), citeSources);
 
@@ -3342,10 +3403,16 @@ async function sendMessage(opts){
       pushMemory('assistant', data.reply);
       showLocalNotificationIfHidden(data.reply);
       const citeSources = (data.citations||[]).map(c => ({
-        title: c.title_sw || c.title_en || c.topic_id,
-        url: '#',
+        title: c.title_sw || c.title_en || c.title || c.topic_id,
+        title_en: c.title_en || c.title,
+        title_sw: c.title_sw || c.title,
+        url: (c.url && c.url !== '#') ? c.url : '',
         domain: 'SKONGA Library',
-        kind: 'curriculum'
+        kind: 'curriculum',
+        subject_name: c.subject_name || c.subject || '',
+        form_id: c.form_id || c.form || '',
+        difficulty: c.difficulty || '',
+        topic_id: c.topic_id || ''
       }));
       streamMessage(data.reply, ()=>{ saveCurrentSession(); finishAiTurn(); }, [...(data.sources||[]), ...citeSources], data.graph || null, data.practiceQ || null);
     }catch(err){
@@ -3391,10 +3458,16 @@ async function sendMessage(opts){
     pushMemory('assistant', data.reply);
     showLocalNotificationIfHidden(data.reply);
     const citeSources = (data.citations||[]).map(c => ({
-      title: c.title_sw || c.title_en || c.topic_id,
-      url: '#',
+      title: c.title_sw || c.title_en || c.title || c.topic_id,
+      title_en: c.title_en || c.title,
+      title_sw: c.title_sw || c.title,
+      url: (c.url && c.url !== '#') ? c.url : '',
       domain: 'SKONGA Library',
-      kind: 'curriculum'
+      kind: 'curriculum',
+      subject_name: c.subject_name || c.subject || '',
+      form_id: c.form_id || c.form || '',
+      difficulty: c.difficulty || '',
+      topic_id: c.topic_id || ''
     }));
     streamMessage(data.reply, ()=>{ saveCurrentSession(); finishAiTurn(); }, citeSources, data.graph || null, data.practiceQ || null);
 
@@ -3778,10 +3851,16 @@ function sendScanToChat(){
       if(!data.reply) throw new Error('Backend did not return a valid reply');
 
       const citeSources = (data.citations||[]).map(c => ({
-        title: c.title_sw || c.title_en || c.topic_id,
-        url: '#',
+        title: c.title_sw || c.title_en || c.title || c.topic_id,
+        title_en: c.title_en || c.title,
+        title_sw: c.title_sw || c.title,
+        url: (c.url && c.url !== '#') ? c.url : '',
         domain: 'SKONGA Library',
-        kind: 'curriculum'
+        kind: 'curriculum',
+        subject_name: c.subject_name || c.subject || '',
+        form_id: c.form_id || c.form || '',
+        difficulty: c.difficulty || '',
+        topic_id: c.topic_id || ''
       }));
       streamMessage(data.reply, ()=>saveCurrentSession(), citeSources);
 
