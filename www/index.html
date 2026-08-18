@@ -793,126 +793,155 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
      app still renders — auth features just show friendly message.
 ═════════════════════════════════════════════════════════════════ -->
 <script type="module">
-/* Firebase is loaded from CDN — this WILL fail when the device is offline.
-   The entire block is wrapped in try-catch so a network failure here does
-   NOT prevent the rest of the app from working. When offline:
-   - window._fb.ready stays false
-   - Auth features show a friendly "no internet" message
-   - Everything else (chat history, notes, offline queue) still works */
-try {
-const CDN = 'https://www.gstatic.com/firebasejs/12.16.0';
-const [
-  { initializeApp },
-  { getAuth, onAuthStateChanged, signInWithEmailAndPassword,
-    createUserWithEmailAndPassword, signOut, updateProfile,
-    GoogleAuthProvider, signInWithPopup, signInWithRedirect,
-    getRedirectResult }
-] = await Promise.all([
-  import(`${CDN}/firebase-app.js`),
-  import(`${CDN}/firebase-auth.js`)
-]);
+/* SKONGA Auth — auth-content-service (Firebase disabled for trials)
+   Same window._fb bridge shape so main UI code stays unchanged. */
+const AUTH_BASE = 'https://skonga-auth-content-service.onrender.com';
+const LS_TOKEN = 'skonga_auth_token';
+const LS_USER  = 'skonga_auth_user';
 
-const app  = initializeApp({
-  apiKey:            "AIzaSyBEUstmycExFobMi4abvxluyGMNRGDyabs",
-  authDomain:        "skonga-ai-ddfc9.firebaseapp.com",
-  projectId:         "skonga-ai-ddfc9",
-  storageBucket:     "skonga-ai-ddfc9.firebasestorage.app",
-  messagingSenderId: "907249107855",
-  appId:             "1:907249107855:web:963c877cc22d6af1a441fa"
-});
-const auth      = getAuth(app);
-const gProvider = new GoogleAuthProvider();
-gProvider.addScope('profile');
-gProvider.addScope('email');
-
-const FB_ERRORS = {
-  'auth/invalid-email':           'Invalid email address.',
-  'auth/user-not-found':          'Account not found. Please register first.',
-  'auth/wrong-password':          'Incorrect password.',
-  'auth/invalid-credential':      'Invalid email or password.',
-  'auth/email-already-in-use':    'This email already has an account.',
-  'auth/weak-password':           'Password must be at least 6 characters.',
-  'auth/network-request-failed':  'No network connection. Check your internet.',
-  'auth/too-many-requests':       'Too many attempts. Please try again later.',
-  'auth/popup-closed-by-user':    'Google sign-in window was closed.',
-  'auth/cancelled-popup-request': 'Please wait a moment and try again.',
+const AUTH_ERRORS = {
+  INVALID_EMAIL: 'Invalid email address.',
+  WEAK_PASSWORD: 'Password must be at least 6 characters.',
+  EMAIL_EXISTS: 'This email already has an account.',
+  INVALID_CREDENTIALS: 'Invalid email or password.',
+  UNAUTHORIZED: 'Session expired. Please sign in again.',
+  NETWORK: 'No network connection. Check your internet.',
 };
-const fbErr = code => FB_ERRORS[code] || 'An error occurred. Please try again.';
+const authErr = (code, fallback) => AUTH_ERRORS[code] || fallback || 'An error occurred. Please try again.';
 
-/* ── window._fb bridge ─────────────────────────────────────────
-   Main script accesses Firebase ONLY through this object.
-   Separation is required because ES module scripts have their
-   own scope — variables are NOT global by default.
-───────────────────────────────────────────────────────────────── */
+function loadStored() {
+  try {
+    const token = localStorage.getItem(LS_TOKEN);
+    const userRaw = localStorage.getItem(LS_USER);
+    const user = userRaw ? JSON.parse(userRaw) : null;
+    return { token, user };
+  } catch {
+    return { token: null, user: null };
+  }
+}
+
+function saveSession(token, user) {
+  if (token) localStorage.setItem(LS_TOKEN, token);
+  else localStorage.removeItem(LS_TOKEN);
+  if (user) localStorage.setItem(LS_USER, JSON.stringify(user));
+  else localStorage.removeItem(LS_USER);
+}
+
+function toFbUser(user) {
+  if (!user) return null;
+  return {
+    uid: user.id,
+    email: user.email,
+    displayName: user.name || (user.email ? user.email.split('@')[0] : 'User'),
+    photoURL: null,
+    providerData: [{ providerId: 'password' }],
+  };
+}
+
+function emitAuth(user) {
+  window._fb.currentUser = user;
+  window.dispatchEvent(new CustomEvent('fbAuthChanged', { detail: user }));
+}
+
+async function api(path, { method = 'GET', body, token } = {}) {
+  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
+  if (token) headers.Authorization = 'Bearer ' + token;
+  let res;
+  try {
+    res = await fetch(AUTH_BASE + path, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch (e) {
+    const err = new Error('network');
+    err.code = 'NETWORK';
+    throw err;
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(data.error || 'Request failed');
+    err.code = data.code || 'ERROR';
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+const stored = loadStored();
+
 window._fb = {
   ready: true,
-  currentUser: null,
-  idToken:     null,
-  err:         fbErr,
+  currentUser: toFbUser(stored.user),
+  idToken: stored.token || null,
+  authBase: AUTH_BASE,
+  err: (code) => authErr(code),
 
-  async signIn(email, pass){
-    return signInWithEmailAndPassword(auth, email, pass);
+  async signIn(email, pass) {
+    const data = await api('/api/auth/login', {
+      method: 'POST',
+      body: { email, password: pass },
+    });
+    saveSession(data.token, data.user);
+    window._fb.idToken = data.token;
+    const u = toFbUser(data.user);
+    emitAuth(u);
+    return { user: u };
   },
-  async signUp(name, email, pass){
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-    return cred;
+
+  async signUp(name, email, pass) {
+    const data = await api('/api/auth/signup', {
+      method: 'POST',
+      body: { email, password: pass, name },
+    });
+    saveSession(data.token, data.user);
+    window._fb.idToken = data.token;
+    const u = toFbUser(data.user);
+    emitAuth(u);
+    return { user: u };
   },
-  async signInGoogle(){
-    if(window.Capacitor?.isNativePlatform?.())
-      return signInWithRedirect(auth, gProvider);
-    return signInWithPopup(auth, gProvider);
+
+  async signInGoogle() {
+    const err = new Error('Google sign-in disabled');
+    err.code = 'auth/operation-not-allowed';
+    throw err;
   },
-  async logout(){ return signOut(auth); },
-  async refreshToken(){
-    if(!auth.currentUser) return null;
-    return auth.currentUser.getIdToken(true);
-  }
+
+  async logout() {
+    saveSession(null, null);
+    window._fb.idToken = null;
+    emitAuth(null);
+  },
+
+  async refreshToken() {
+    const token = localStorage.getItem(LS_TOKEN);
+    if (!token) return null;
+    try {
+      const data = await api('/api/auth/me', { token });
+      if (data.user) {
+        saveSession(token, data.user);
+        const u = toFbUser(data.user);
+        window._fb.currentUser = u;
+        window._fb.idToken = token;
+        return token;
+      }
+    } catch {
+      saveSession(null, null);
+      window._fb.idToken = null;
+      emitAuth(null);
+    }
+    return null;
+  },
 };
 
-/* ── Auth state listener ─────────────────────────────────────── */
-onAuthStateChanged(auth, async user => {
-  window._fb.currentUser = user;
-  window._fb.idToken     = user ? await user.getIdToken() : null;
-  if(user){
-    if(!window._fb._refreshTimer){
-      window._fb._refreshTimer = setInterval(async () => {
-        try{
-          window._fb.idToken = await window._fb.refreshToken();
-        }catch(e){
-          console.warn('[Firebase] Token refresh failed — user may need to sign in again:', e.message||e);
-          window._fb.idToken = null;
-        }
-      }, 55 * 60 * 1000);
-    }
-  } else {
-    clearInterval(window._fb._refreshTimer);
-    window._fb._refreshTimer = null;
-  }
-  window.dispatchEvent(new CustomEvent('fbAuthChanged', { detail: user }));
-});
-
-getRedirectResult(auth).catch(()=>{});
-
-} catch(fbInitErr) {
-  /* Firebase SDK failed to load (most likely: no internet connection).
-     Set up a minimal stub so auth calls fail gracefully with a clear
-     message instead of throwing "Cannot read properties of undefined". */
-  console.warn('[Firebase] SDK failed to load (offline?):', fbInitErr.message || fbInitErr);
-  window._fb = {
-    ready: false,
-    currentUser: null,
-    idToken: null,
-    err: () => 'No internet connection. Please connect and try again.',
-    async signIn(){ throw { code:'auth/network-request-failed' }; },
-    async signUp(){ throw { code:'auth/network-request-failed' }; },
-    async signInGoogle(){ throw { code:'auth/network-request-failed' }; },
-    async logout(){ return; },
-    async refreshToken(){ return null; }
-  };
-  /* Fire auth-changed with null so the app knows there is no signed-in user */
-  window.dispatchEvent(new CustomEvent('fbAuthChanged', { detail: null }));
+// Restore session into profile UI
+if (window._fb.currentUser) {
+  queueMicrotask(() => emitAuth(window._fb.currentUser));
+} else {
+  queueMicrotask(() => emitAuth(null));
 }
+
+console.info('[SKONGA Auth] Using auth-content-service →', AUTH_BASE);
 </script>
 
 </head>
@@ -1451,6 +1480,8 @@ getRedirectResult(auth).catch(()=>{});
    (e.g. on another phone on the same network: http://192.168.x.x:3000)
 ══════════════════════════════════════ */
 const API_BASE = 'https://skonga-backend-v2.onrender.com';
+// Auth: handled by module script → auth-content-service (not Firebase)
+// const AUTH_BASE = 'https://skonga-auth-content-service.onrender.com';
 
 /* ══════════════════════════════════════
    SKONGA LIBRARY INTEGRATION (client side)
@@ -3455,7 +3486,13 @@ async function sendMessage(opts){
 
     if(!res.ok){
       let errMsg='Tatizo la server limetokea';
-      try{ const errData=await res.json(); if(errData.error) errMsg=errData.error; }catch(_){}
+      try{
+        const errData=await res.json();
+        if(errData.code==='QUOTA_EXCEEDED'){
+          errMsg=errData.error||'Daily free limit reached. Upgrade to Pro.';
+          try{ if(typeof openPaySheet==='function') openPaySheet(); }catch(_){}
+        } else if(errData.error) errMsg=errData.error;
+      }catch(_){}
       throw new Error(errMsg);
     }
 
@@ -4448,7 +4485,7 @@ function handleGoogleAuth(){
   }
   window._fb.signInGoogle()
     .then(() => { if(typeof closeProfile === 'function') closeProfile(); })
-    .catch(e => { showToast(window._fb.err(e.code), true); });
+    .catch(e => { showToast(e.code==='auth/operation-not-allowed'?'Google sign-in is off. Use email.':(window._fb.err(e.code)||e.message), true); });
 }
 
 function handleLogout(){
