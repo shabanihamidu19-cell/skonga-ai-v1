@@ -3118,7 +3118,13 @@ async function handleImageAttachment(dataUrl, name, promptText){
 
     if(!res.ok){
       let errMsg='Tatizo la server limetokea';
-      try{ const errData=await res.json(); if(errData.error) errMsg=errData.error; }catch(_){}
+      try{
+        const errData=await res.json();
+        if(errData.code==='QUOTA_EXCEEDED'){
+          errMsg=errData.error||'Daily free limit reached. Upgrade to Pro.';
+          try{ if(typeof openPaySheet==='function') openPaySheet(); }catch(_){}
+        } else if(errData.error) errMsg=errData.error;
+      }catch(_){}
       throw new Error(errMsg);
     }
 
@@ -3440,6 +3446,8 @@ async function sendMessage(opts){
         sessionId: DEVICE_SESSION_ID,
         notifyOnComplete: appSettings.notificationsEnabled && isNativeApp,
         formHint: getStudentFormHint(),
+        // Usage quota: Firebase uid → AI backend → auth-content-service
+        userId: (window._fb && window._fb.currentUser && window._fb.currentUser.uid) || null,
       })
     });
 
