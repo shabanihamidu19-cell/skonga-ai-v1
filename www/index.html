@@ -880,7 +880,7 @@ window._fb = {
   async signIn(email, pass) {
     const data = await api('/api/auth/login', {
       method: 'POST',
-      body: { email, password: pass },
+      body: { email: String(email||'').trim().toLowerCase(), password: String(pass||'') },
     });
     saveSession(data.token, data.user);
     window._fb.idToken = data.token;
@@ -892,7 +892,7 @@ window._fb = {
   async signUp(name, email, pass) {
     const data = await api('/api/auth/signup', {
       method: 'POST',
-      body: { email, password: pass, name },
+      body: { email: String(email||'').trim().toLowerCase(), password: String(pass||''), name: String(name||'').trim() },
     });
     saveSession(data.token, data.user);
     window._fb.idToken = data.token;
@@ -4377,8 +4377,8 @@ const levelLabels={
 };
 
 function handleLogin(){
-  const email = ($('loginEmail')?.value||'').trim();
-  const pass  = ($('loginPass')?.value||'').trim();
+  const email = ($('loginEmail')?.value||'').trim().toLowerCase();
+  const pass  = ($('loginPass')?.value||''); // do not alter password chars; backend trims only if needed
 
   // Clear previous errors
   ['loginErr'].forEach(id => { const e=document.getElementById(id); if(e) e.textContent=''; });
@@ -4414,15 +4414,15 @@ function handleLogin(){
       if(typeof closeProfile === 'function') closeProfile();
     })
     .catch(e => {
-      _authErr('loginErr', window._fb.err(e.code));
+      _authErr('loginErr', (window._fb.err(e.code) && e.code) ? window._fb.err(e.code) : (e.message || 'Login failed'));
       _authBtnLoading(btn, false, 'Log In');
     });
 }
 
 function handleRegister(){
   const name  = ($('regName')?.value||'').trim();
-  const email = ($('regEmail')?.value||'').trim();
-  const pass  = ($('regPass')?.value||'').trim();
+  const email = ($('regEmail')?.value||'').trim().toLowerCase();
+  const pass  = ($('regPass')?.value||'');
   const level = $('regLevel')?.value||'';
 
   // Clear previous errors
@@ -4646,41 +4646,76 @@ function payGoPhone(){
   const inp = $('payPhone');
   if(inp){ inp.focus(); payOnPhoneInput(); }
 }
-function payDetectNetwork(phone){
-  let p = (phone||'').replace(/\s+/g,'').replace(/^\+/,'');
-  if(p.startsWith('0')) p = '255'+p.slice(1);
-  if(!p.startsWith('255')) p = '255'+p;
-  const pre = p.slice(0,5);
-  if(['25574','25575','25576'].includes(pre)) return 'M-Pesa';
-  if(['25571','25565','25567'].includes(pre)) return 'Tigo Pesa';
-  if(['25568','25569','25578'].includes(pre)) return 'Airtel Money';
-  if(['25562'].includes(pre)) return 'HaloPesa';
-  return null;
-}
+/** Normalize TZ MSISDN → 255XXXXXXXXX (12 digits). */
 function payNormalizePhone(phone){
-  let p = (phone||'').replace(/\s+/g,'').replace(/^\+/,'');
+  let p = String(phone||'').replace(/\s+/g,'').replace(/^\+/,'');
   if(p.startsWith('0')) p = '255'+p.slice(1);
-  if(!p.startsWith('255')) p = '255'+p;
+  if(!p.startsWith('255') && /^[67]\d{8}$/.test(p)) p = '255'+p;
+  if(!p.startsWith('255') && /^\d{9}$/.test(p)) p = '255'+p;
   return p;
 }
+/** Format validity only (Tanzania mobile: 255 + 9 digits starting 6 or 7). */
+function payIsValidTzMobile(phone){
+  return /^255[67]\d{8}$/.test(payNormalizePhone(phone));
+}
+/**
+ * Operator label for UX only — NOT a gate for Continue / STK.
+ * Prefix map is maintainable; unknown-but-valid numbers still pay.
+ * (PSP routes STK by MSISDN; client does not need perfect MNO table.)
+ */
+const TZ_MM_PREFIX = {
+  '25561': 'Yas',
+  '25562': 'HaloPesa',
+  '25563': 'Mobile',
+  '25564': 'Mobile',
+  '25565': 'Tigo Pesa',
+  '25566': 'Yas',
+  '25567': 'Tigo Pesa',
+  '25568': 'Airtel Money',
+  '25569': 'Airtel Money',
+  '25571': 'Tigo Pesa',
+  '25573': 'Mobile',
+  '25574': 'M-Pesa',
+  '25575': 'M-Pesa',
+  '25576': 'M-Pesa',
+  '25577': 'Zantel',
+  '25578': 'Airtel Money',
+  '25579': 'Mobile',
+};
+function payDetectNetwork(phone){
+  if(!payIsValidTzMobile(phone)) return null;
+  const p = payNormalizePhone(phone);
+  const pre = p.slice(0,5);
+  return TZ_MM_PREFIX[pre] || 'Mobile money';
+}
 function payOnPhoneInput(){
-  const inp = $('payPhone');
-  const badge = $('payNetBadge');
-  const next = $('payNextFromPhone');
+  const inp = document.getElementById('payPhone');
+  const badge = document.getElementById('payNetBadge');
+  const next = document.getElementById('payNextFromPhone');
   if(!inp) return;
-  const net = payDetectNetwork(inp.value);
+  const raw = inp.value;
+  const valid = payIsValidTzMobile(raw);
+  const net = valid ? payDetectNetwork(raw) : null;
   payState.network = net;
-  payState.phone = inp.value.trim();
+  payState.phone = String(raw||'').trim();
   if(badge){
-    badge.textContent = net ? `Network: ${net} ✓` : (inp.value.length>=9 ? 'Unknown number' : '');
-    badge.style.color = net ? 'var(--green)' : 'var(--red)';
+    if(!String(raw||'').replace(/\s+/g,'').length){
+      badge.textContent = '';
+    } else if(valid){
+      badge.textContent = net ? ('Network: ' + net + ' ✓') : 'Valid TZ number ✓';
+      badge.style.color = 'var(--green)';
+    } else {
+      badge.textContent = 'Enter a valid TZ mobile (e.g. 07XX XXX XXX)';
+      badge.style.color = 'var(--red)';
+    }
   }
-  const ok = !!net && /^255\d{9}$/.test(payNormalizePhone(inp.value));
-  if(next) next.disabled = !ok;
+  // Continue depends on FORMAT validity, not operator name
+  if(next) next.disabled = !valid;
 }
 function payGoConfirm(){
   const plan = SKONGA_PLANS.find(p=>p.id===payState.planId);
-  if(!plan || !payState.network) return;
+  if(!plan || !payIsValidTzMobile(payState.phone)) return;
+  if(!payState.network) payState.network = payDetectNetwork(payState.phone) || 'Mobile money';
   const sum = $('paySummary');
   if(sum){
     sum.innerHTML = `
@@ -4814,7 +4849,11 @@ function closeLegalModal(){ $('legalSheet').classList.add('hidden'); }
   const paySheet = $('paySheet');
   if(paySheet) paySheet.addEventListener('click', e=>{ if(e.target===paySheet) closeSkongaPay(); });
   const phone = $('payPhone');
-  if(phone) phone.addEventListener('input', payOnPhoneInput);
+  if(phone){
+    ['input','change','keyup','blur','paste'].forEach(ev=>{
+      phone.addEventListener(ev, ()=>{ try{ payOnPhoneInput(); }catch(e){} });
+    });
+  }
   const legalClose = $('legalClose');
   if(legalClose) legalClose.addEventListener('click', closeLegalModal);
   const legalSheet = $('legalSheet');
