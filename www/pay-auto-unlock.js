@@ -1,4 +1,6 @@
-/* SKONGA pay auto-unlock — every user after mobile money payment */
+/* SKONGA pay auto-unlock — every user after mobile money payment
+ * Include before </body>: <script src="./pay-auto-unlock.js"></script>
+ */
 (function(){
   function saveProFromServer(pro, orderId){
     if(!pro || !pro.active || !pro.expiresAt) return false;
@@ -65,4 +67,37 @@
     }catch(e){}
     return false;
   };
+
+  function installPatches(){
+    if(typeof pollProUntilActive==='function' && !window.__skongaPayPatched){
+      window.__skongaPayPatched = true;
+      var orig = pollProUntilActive;
+      window.pollProUntilActive = async function(uid, sessionId, attempts){
+        try{
+          var last = localStorage.getItem('skonga_last_order_id');
+          if(last && typeof pollOrderUntilPaid==='function'){
+            pollOrderUntilPaid(last, uid, sessionId, attempts||40);
+          }
+        }catch(e){}
+        return orig(uid, sessionId, attempts);
+      };
+    }
+    if(typeof paySubmit==='function' && !window.__skongaPaySubmitPatched){
+      window.__skongaPaySubmitPatched = true;
+      var origSubmit = paySubmit;
+      window.paySubmit = async function(){
+        var result = await origSubmit.apply(this, arguments);
+        try{
+          var sub = document.getElementById('payResultSub');
+          var m = sub && sub.textContent && sub.textContent.match(/Ref:\s*([A-Za-z0-9]+)/);
+          if(m) localStorage.setItem('skonga_last_order_id', m[1]);
+        }catch(e){}
+        return result;
+      };
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', function(){ setTimeout(installPatches, 0); });
+  else setTimeout(installPatches, 0);
+  setTimeout(installPatches, 500);
+  setTimeout(installPatches, 2000);
 })();
