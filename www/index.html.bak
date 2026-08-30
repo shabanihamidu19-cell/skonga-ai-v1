@@ -812,6 +812,7 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <!-- Plotly: renders line/bar/scatter graphs from AI math/data responses -->
 <script src="https://cdn.plot.ly/plotly-basic-2.27.0.min.js"></script>
+<script src="./pay-auto-unlock.js"></script>
 
 <!-- ══ FIREBASE AUTH SDK ══════════════════════════════════════════
      Loaded as ES module from CDN. Exposes window._fb bridge so
