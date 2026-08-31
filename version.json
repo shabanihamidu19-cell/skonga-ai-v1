@@ -2,7 +2,8 @@
   "version": "1.4",
   "versionCode": 14,
   "force": false,
-  "message": "Current stable. Pro auto-unlock + ClickPesa live payments.",
-  "apkUrl": "https://github.com/shabanihamidu19-cell/skonga-ai-v1/releases/latest/download/skonga-ai.apk",
+  "message": "Pro auto-unlock + ClickPesa live. Direct APK from GitHub Releases.",
+  "apkUrl": "https://github.com/shabanihamidu19-cell/skonga-ai-v1/releases/download/build-60/app-debug.apk",
+  "sha256": "30bb6cedf4d9f4f74e29dc83f18947f684fe6dcfecf9ebfb75b67d5cb275512e",
   "releasedAt": "2026-08-31"
 }
