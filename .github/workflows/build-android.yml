@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -97,3 +99,20 @@ jobs:
         with:
           name: skonga-ai-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
+
+      # ── Publish .apk to GitHub Release (direct download, not zip) ──
+      - name: Publish APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: SKONGA AI build ${{ github.run_number }}
+          body: |
+            Auto-built from main.
+            Install the .apk (allow install from unknown sources).
+          files: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
