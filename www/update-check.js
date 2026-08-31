@@ -4,11 +4,7 @@
  * On launch, fetches version.json from GitHub. If remote version is newer
  * than APP_VERSION, shows a dialog and opens the APK download URL.
  *
- * Each release:
- *  1. Bump APP_VERSION in index.html
- *  2. Bump version + apkUrl in /version.json
- *  3. Upload APK to GitHub Releases
- *  4. Build & ship new APK
+ * Also loads skonga-ux-hooks.js (Pro expiry reminder, limit→Pro, AI notify).
  */
 (function () {
   var VERSION_URL =
@@ -22,7 +18,6 @@
     return '0.0.0';
   }
 
-  /** Compare semver-like strings: "1.4.1" > "1.4" → 1 */
   function cmpVersion(a, b) {
     var pa = String(a || '0').split('.').map(function (x) { return parseInt(x, 10) || 0; });
     var pb = String(b || '0').split('.').map(function (x) { return parseInt(x, 10) || 0; });
@@ -112,9 +107,7 @@
       if (cmpVersion(remote.version, local) > 0) {
         showUpdateUI(remote);
       }
-    } catch (e) {
-      // offline or blocked — silent
-    }
+    } catch (e) {}
   }
 
   function schedule() {
@@ -130,4 +123,14 @@
   }
 
   window.checkAppUpdate = checkAppUpdate;
+
+  // Load UX hooks (Pro expiry, limit → Pro panel, AI reply notify)
+  try {
+    if (!document.querySelector('script[src*="skonga-ux-hooks"]')) {
+      var s = document.createElement('script');
+      s.src = './skonga-ux-hooks.js';
+      s.async = false;
+      (document.body || document.documentElement).appendChild(s);
+    }
+  } catch (e) {}
 })();
