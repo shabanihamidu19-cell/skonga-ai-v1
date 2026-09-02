@@ -1,0 +1,14 @@
+{
+  "name": "skonga-ai",
+  "private": true,
+  "version": "2.0.0",
+  "description": "SKONGA AI — React web + React Native mobile + TypeScript monorepo",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "web": "npm run dev --workspace=@skonga/web",
+    "web:build": "npm run build --workspace=@skonga/web",
+    "mobile": "npm start --workspace=@skonga/mobile",
+    "mobile:android": "npm run android --workspace=@skonga/mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}

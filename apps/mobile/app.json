@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "SKONGA AI",
+    "slug": "skonga-ai",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "scheme": "skonga",
+    "userInterfaceStyle": "automatic",
+    "ios": { "supportsTablet": true, "bundleIdentifier": "tz.co.kclplatform.skonga" },
+    "android": { "package": "tz.co.kclplatform.skonga" }
+  }
+}

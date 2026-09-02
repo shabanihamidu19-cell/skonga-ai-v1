@@ -1,0 +1,85 @@
+:root {
+  --bg: #0d0f14;
+  --panel: #161922;
+  --line: #2a3040;
+  --text: #eef1f7;
+  --muted: #9aa3b5;
+  --accent: #8b5cf6;
+  --accent-2: #a78bfa;
+}
+[data-theme="light"] {
+  --bg: #f4f5f8;
+  --panel: #ffffff;
+  --line: #e2e5ee;
+  --text: #161922;
+  --muted: #5b6475;
+}
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body {
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+.app { display: grid; grid-template-columns: 280px 1fr; height: 100%; }
+.sidebar {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+.brand { font-weight: 700; letter-spacing: 0.04em; margin-bottom: 16px; }
+.btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+.btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.threads { flex: 1; overflow: auto; margin: 12px 0; }
+.thread {
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--muted);
+}
+.thread.active, .thread:hover { background: #ffffff10; color: var(--text); }
+.foot { display: flex; gap: 8px; }
+.main { display: flex; flex-direction: column; min-width: 0; }
+.top {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px; border-bottom: 1px solid var(--line);
+}
+.messages { flex: 1; overflow: auto; padding: 24px; }
+.bubble { max-width: 680px; margin: 0 auto 14px; line-height: 1.5; }
+.bubble.user { text-align: right; color: var(--accent-2); }
+.composer {
+  display: flex; gap: 8px; padding: 16px 20px; border-top: 1px solid var(--line);
+}
+.composer input, .sheet input, select {
+  flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--text);
+}
+.sheet-backdrop {
+  position: fixed; inset: 0; background: #0008; display: flex; align-items: flex-end;
+  justify-content: center;
+}
+.sheet {
+  width: min(480px, 100%); background: var(--panel); border-radius: 16px 16px 0 0;
+  padding: 20px; border: 1px solid var(--line);
+}
+.plans { display: grid; gap: 8px; margin: 12px 0; }
+.plan {
+  display: flex; justify-content: space-between; padding: 12px; border-radius: 10px;
+  border: 1px solid var(--line); cursor: pointer;
+}
+.plan.selected { border-color: var(--accent); }
+.muted { color: var(--muted); font-size: 13px; }
+@media (max-width: 800px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+}
