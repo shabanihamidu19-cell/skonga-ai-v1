@@ -7,6 +7,7 @@
  * Also loads:
  *  - skonga-ux-hooks.js (Pro expiry reminder, limit→Pro, AI notify)
  *  - skonga-visuals.js  (web search images / diagrams in chat)
+ *  - skonga-profile-tahasusi.js (Form 1–6 + A-Level tahasusi)
  */
 (function () {
   var VERSION_URL =
@@ -136,8 +137,7 @@
     } catch (e) {}
   }
 
-  // Load UX hooks (Pro expiry, limit → Pro panel, AI reply notify)
   loadScript('./skonga-ux-hooks.js');
-  // Load web-search visuals (images / diagrams from sources)
   loadScript('./skonga-visuals.js');
+  loadScript('./skonga-profile-tahasusi.js');
 })();
