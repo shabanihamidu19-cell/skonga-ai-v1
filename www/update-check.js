@@ -4,7 +4,9 @@
  * On launch, fetches version.json from GitHub. If remote version is newer
  * than APP_VERSION, shows a dialog and opens the APK download URL.
  *
- * Also loads skonga-ux-hooks.js (Pro expiry reminder, limit→Pro, AI notify).
+ * Also loads:
+ *  - skonga-ux-hooks.js (Pro expiry reminder, limit→Pro, AI notify)
+ *  - skonga-visuals.js  (web search images / diagrams in chat)
  */
 (function () {
   var VERSION_URL =
@@ -124,13 +126,18 @@
 
   window.checkAppUpdate = checkAppUpdate;
 
-  // Load UX hooks (Pro expiry, limit → Pro panel, AI reply notify)
-  try {
-    if (!document.querySelector('script[src*="skonga-ux-hooks"]')) {
+  function loadScript(src) {
+    try {
+      if (document.querySelector('script[src*="' + src.replace('./', '') + '"]')) return;
       var s = document.createElement('script');
-      s.src = './skonga-ux-hooks.js';
+      s.src = src;
       s.async = false;
       (document.body || document.documentElement).appendChild(s);
-    }
-  } catch (e) {}
+    } catch (e) {}
+  }
+
+  // Load UX hooks (Pro expiry, limit → Pro panel, AI reply notify)
+  loadScript('./skonga-ux-hooks.js');
+  // Load web-search visuals (images / diagrams from sources)
+  loadScript('./skonga-visuals.js');
 })();
