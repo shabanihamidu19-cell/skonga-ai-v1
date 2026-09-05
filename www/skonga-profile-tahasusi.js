@@ -1,10 +1,7 @@
 /**
  * skonga-profile-tahasusi.js
- * - Removes University from level picker
- * - Study profile: Form 1–6 + Tahasusi (Form 5–6)
- * - Saves to localStorage (skonga_user_extras)
- * - Injects formLevel + combinationCode into /api/chat and /api/chat-search
- * - Relabels Trending → Suggested Topics and filters by combination subjects
+ * Study profile UI (English) + Form 1–6 + optional A-Level Combination.
+ * Expected career fields stay on backend only — never shown to students.
  */
 (function () {
   'use strict';
@@ -21,11 +18,10 @@
     form4: 'Form 4 (NECTA)',
     form5: 'Form 5',
     form6: 'Form 6 (ACSEE)',
-    primary7: 'Darasa la 7 (PSLE)',
+    primary7: 'Standard 7 (PSLE)',
   };
 
   var combosCache = null;
-  var categoriesCache = null;
 
   function getExtras() {
     try {
@@ -74,37 +70,59 @@
     save: saveExtras,
   };
 
-  /* ── CSS ── */
   function injectCSS() {
     if (document.getElementById('skonga-tahasusi-css')) return;
     var s = document.createElement('style');
     s.id = 'skonga-tahasusi-css';
     s.textContent = [
-      '.study-profile-box{margin:14px 0;padding:14px;border-radius:14px;border:1px solid var(--border);background:rgba(124,58,237,.08)}',
-      '.study-profile-box h4{margin:0 0 10px;font-size:.82rem;color:var(--purple-light);letter-spacing:.04em;text-transform:uppercase}',
-      '.study-profile-box .field{margin-bottom:10px}',
-      '.study-profile-box .field:last-child{margin-bottom:0}',
-      '#tahasusiWrap{display:none}',
+      /* Professional study card */
+      '.study-profile-box{margin:16px 0;border-radius:16px;overflow:hidden;',
+      'border:1px solid rgba(168,85,247,.35);',
+      'background:linear-gradient(165deg,rgba(124,58,237,.14) 0%,rgba(15,12,28,.92) 45%,rgba(6,182,212,.06) 100%);',
+      'box-shadow:0 8px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06)}',
+      '.study-profile-tabs{display:flex;border-bottom:1px solid rgba(168,85,247,.25)}',
+      '.study-tab{flex:1;padding:12px 10px;border:none;background:transparent;',
+      'font-family:var(--font-b);font-size:.78rem;font-weight:600;color:var(--text-muted);',
+      'cursor:pointer;letter-spacing:.03em;position:relative;transition:color .2s,background .2s}',
+      '.study-tab.active{color:#e9d5ff;background:rgba(124,58,237,.18)}',
+      '.study-tab.active::after{content:"";position:absolute;left:12%;right:12%;bottom:0;',
+      'height:3px;border-radius:3px 3px 0 0;',
+      'background:linear-gradient(90deg,#7c3aed,#c084fc,#22d3ee)}',
+      '.study-tab-body{padding:14px 14px 16px}',
+      '.study-profile-box .field{margin-bottom:12px}',
+      '.study-profile-box .field label{display:block;font-size:.72rem;color:var(--text-muted);',
+      'margin-bottom:6px;letter-spacing:.02em}',
+      '.study-profile-box select{width:100%;background:rgba(0,0,0,.28);',
+      'border:1.5px solid rgba(168,85,247,.3);border-radius:12px;padding:12px 14px;',
+      'font-family:var(--font-b);font-size:.88rem;color:var(--text-primary);outline:none;',
+      'appearance:none;cursor:pointer;',
+      'background-image:url("data:image/svg+xml,%3Csvg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23c084fc\' stroke-width=\'2\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpolyline points=\'6 9 12 15 18 9\'/%3E%3C/svg%3E");',
+      'background-repeat:no-repeat;background-position:right 12px center;background-size:16px;padding-right:36px}',
+      '.study-profile-box select:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.2)}',
+      '#tahasusiWrap{display:none;margin-top:4px;padding-top:12px;',
+      'border-top:1px dashed rgba(168,85,247,.25);animation:studySlide .25s ease}',
       '#tahasusiWrap.show{display:block}',
-      '.combo-meta{font-size:.72rem;color:var(--text-secondary);line-height:1.45;margin-top:8px}',
-      '.combo-meta strong{color:var(--text-primary)}',
-      '.study-save-btn{width:100%;margin-top:10px;padding:11px;border:none;border-radius:11px;background:linear-gradient(135deg,var(--purple-main),var(--purple-mid));color:#fff;font-family:var(--font-b);font-size:.85rem;font-weight:600;cursor:pointer}',
-      '.study-save-btn:active{opacity:.9}',
+      '@keyframes studySlide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}',
+      '.combo-optional{font-size:.68rem;color:var(--cyan);margin:0 0 8px;font-weight:500}',
+      '.combo-subjects{font-size:.75rem;color:var(--text-secondary);line-height:1.4;margin-top:8px;',
+      'padding:8px 10px;border-radius:10px;background:rgba(34,211,238,.08);',
+      'border:1px solid rgba(34,211,238,.2)}',
+      '.study-save-btn{width:100%;margin-top:6px;padding:12px;border:none;border-radius:12px;',
+      'background:linear-gradient(135deg,#7c3aed,#a855f7 50%,#06b6d4);color:#fff;',
+      'font-family:var(--font-b);font-size:.88rem;font-weight:600;cursor:pointer;',
+      'box-shadow:0 4px 16px rgba(124,58,237,.35)}',
+      '.study-save-btn:active{opacity:.9;transform:scale(.98)}',
     ].join('');
     document.head.appendChild(s);
   }
 
-  /* ── Remove University option ── */
   function cleanLevelSelect(sel) {
     if (!sel) return;
     Array.from(sel.options).forEach(function (opt) {
-      if (String(opt.value).toLowerCase() === 'university') {
-        opt.remove();
-      }
+      if (String(opt.value).toLowerCase() === 'university') opt.remove();
     });
   }
 
-  /* ── Load combinations from API ── */
   function loadCombinations() {
     if (combosCache) return Promise.resolve(combosCache);
     return fetch(API + '/api/tahasusi', { credentials: 'omit' })
@@ -114,7 +132,6 @@
       })
       .then(function (data) {
         combosCache = data.combinations || [];
-        categoriesCache = data.categories || [];
         return combosCache;
       })
       .catch(function () {
@@ -127,16 +144,20 @@
     if (!selectEl) return;
     var groups = {};
     (combosCache || []).forEach(function (c) {
-      var cat = c.categoryNameSw || c.categoryNameEn || 'Nyingine';
+      var cat = c.categoryNameEn || c.categoryNameSw || 'Other';
       if (!groups[cat]) groups[cat] = [];
       groups[cat].push(c);
     });
-    var html = '<option value="">Chagua tahasusi yako...</option>';
+    var html = '<option value="">Optional — skip if unsure</option>';
     Object.keys(groups).forEach(function (cat) {
       html += '<optgroup label="' + cat.replace(/"/g, '') + '">';
       groups[cat].forEach(function (c) {
         var label = c.code + ' — ' + (c.subjects || []).join(', ');
-        var sel = selectedCode && String(selectedCode).toUpperCase() === String(c.code).toUpperCase() ? ' selected' : '';
+        var sel =
+          selectedCode &&
+          String(selectedCode).toUpperCase() === String(c.code).toUpperCase()
+            ? ' selected'
+            : '';
         html += '<option value="' + c.code + '"' + sel + '>' + label + '</option>';
       });
       html += '</optgroup>';
@@ -144,11 +165,13 @@
     selectEl.innerHTML = html;
   }
 
-  function updateComboMeta(code) {
-    var meta = document.getElementById('comboMeta');
+  /** Subjects only — never show expected career fields to students */
+  function updateComboSubjects(code, metaId) {
+    var meta = document.getElementById(metaId || 'comboSubjects');
     if (!meta) return;
     if (!code) {
       meta.innerHTML = '';
+      meta.style.display = 'none';
       return;
     }
     var found = (combosCache || []).find(function (c) {
@@ -156,37 +179,57 @@
     });
     if (!found) {
       meta.innerHTML = '';
+      meta.style.display = 'none';
       return;
     }
+    meta.style.display = 'block';
     meta.innerHTML =
-      '<strong>Masomo:</strong> ' +
-      (found.subjects || []).join(', ') +
-      '<br/><strong>Njia za kazi:</strong> ' +
-      (found.fields || []).slice(0, 8).join(', ') +
-      ((found.fields || []).length > 8 ? '…' : '');
+      '<strong style="color:var(--text-primary)">Subjects:</strong> ' +
+      (found.subjects || []).join(', ');
   }
 
   function toggleTahasusiVisibility(levelVal) {
     var wrap = document.getElementById('tahasusiWrap');
     if (!wrap) return;
     var n = formNumberFromLevel(levelVal);
-    if (n === 5 || n === 6) wrap.classList.add('show');
-    else wrap.classList.remove('show');
+    if (n === 5 || n === 6) {
+      wrap.classList.add('show');
+      // Auto-focus combination select when panel opens
+      setTimeout(function () {
+        var tah = document.getElementById('studyTahasusiSelect');
+        if (tah) {
+          try {
+            tah.focus();
+          } catch (e) {}
+        }
+      }, 80);
+    } else {
+      wrap.classList.remove('show');
+    }
   }
 
   function buildStudyProfileUI() {
     var profileView = document.getElementById('profileView');
-    if (!profileView || document.getElementById('studyProfileBox')) return;
+    if (!profileView) return;
+
+    // Rebuild if already exists so copy stays English after updates
+    var existing = document.getElementById('studyProfileBox');
+    if (existing) existing.remove();
 
     var box = document.createElement('div');
     box.className = 'study-profile-box';
     box.id = 'studyProfileBox';
     box.innerHTML =
-      '<h4>Wasifu wa masomo</h4>' +
-      '<div class="field"><label>Darasa / Kidato</label>' +
+      '<div class="study-profile-tabs">' +
+      '<button type="button" class="study-tab active" data-tab="level">Class level</button>' +
+      '<button type="button" class="study-tab" data-tab="combo" id="studyTabCombo">Combination</button>' +
+      '</div>' +
+      '<div class="study-tab-body">' +
+      '<div class="field">' +
+      '<label>Your class / form</label>' +
       '<select id="studyLevelSelect">' +
-      '<option value="">Chagua darasa...</option>' +
-      '<option value="primary7">Darasa la 7 (PSLE)</option>' +
+      '<option value="">Select your form...</option>' +
+      '<option value="primary7">Standard 7 (PSLE)</option>' +
       '<option value="form1">Form 1</option>' +
       '<option value="form2">Form 2</option>' +
       '<option value="form3">Form 3</option>' +
@@ -194,12 +237,15 @@
       '<option value="form5">Form 5</option>' +
       '<option value="form6">Form 6 (ACSEE)</option>' +
       '</select></div>' +
-      '<div class="field" id="tahasusiWrap">' +
-      '<label>Tahasusi (Form 5–6)</label>' +
-      '<select id="studyTahasusiSelect"><option value="">Inapakia...</option></select>' +
-      '<div class="combo-meta" id="comboMeta"></div>' +
-      '</div>' +
-      '<button type="button" class="study-save-btn" id="studyProfileSave">Hifadhi wasifu</button>';
+      '<div id="tahasusiWrap">' +
+      '<p class="combo-optional">Recommended for Form 5–6 · optional</p>' +
+      '<div class="field">' +
+      '<label>What is your Combination?</label>' +
+      '<select id="studyTahasusiSelect"><option value="">Loading...</option></select>' +
+      '<div class="combo-subjects" id="comboSubjects" style="display:none"></div>' +
+      '</div></div>' +
+      '<button type="button" class="study-save-btn" id="studyProfileSave">Save study profile</button>' +
+      '</div>';
 
     var logout = profileView.querySelector('.logout-btn');
     if (logout) profileView.insertBefore(box, logout);
@@ -208,21 +254,52 @@
     var extras = getExtras();
     var levelSel = document.getElementById('studyLevelSelect');
     var tahSel = document.getElementById('studyTahasusiSelect');
+    var tabCombo = document.getElementById('studyTabCombo');
+
     if (levelSel && extras.level) levelSel.value = extras.level;
     toggleTahasusiVisibility(extras.level || '');
 
+    // Tab highlight: when Form 5/6, switch active visual to Combination tab
+    function syncTabs(levelVal) {
+      var n = formNumberFromLevel(levelVal);
+      box.querySelectorAll('.study-tab').forEach(function (t) {
+        var isCombo = t.getAttribute('data-tab') === 'combo';
+        t.classList.toggle('active', n === 5 || n === 6 ? isCombo : !isCombo);
+      });
+    }
+    syncTabs(extras.level || '');
+
+    box.querySelectorAll('.study-tab').forEach(function (t) {
+      t.addEventListener('click', function () {
+        box.querySelectorAll('.study-tab').forEach(function (x) {
+          x.classList.remove('active');
+        });
+        t.classList.add('active');
+        if (t.getAttribute('data-tab') === 'combo') {
+          var n = formNumberFromLevel(levelSel.value);
+          if (n === 5 || n === 6) {
+            document.getElementById('tahasusiWrap').classList.add('show');
+            if (tahSel) tahSel.focus();
+          } else if (typeof showToast === 'function') {
+            showToast('Select Form 5 or 6 first to set a combination.');
+          }
+        }
+      });
+    });
+
     levelSel.addEventListener('change', function () {
       toggleTahasusiVisibility(levelSel.value);
+      syncTabs(levelSel.value);
     });
 
     loadCombinations().then(function () {
       fillTahasusiSelect(tahSel, extras.combinationCode || '');
-      updateComboMeta(extras.combinationCode || '');
+      updateComboSubjects(extras.combinationCode || '');
     });
 
     if (tahSel) {
       tahSel.addEventListener('change', function () {
-        updateComboMeta(tahSel.value);
+        updateComboSubjects(tahSel.value);
       });
     }
 
@@ -230,12 +307,7 @@
       var level = levelSel.value || '';
       var code = (tahSel && tahSel.value) || '';
       var formN = formNumberFromLevel(level);
-      if ((formN === 5 || formN === 6) && !code) {
-        if (typeof showToast === 'function') {
-          showToast('Chagua tahasusi yako (Form 5/6).', true);
-        }
-        return;
-      }
+      // Combination is optional — no hard block
       if (formN && formN < 5) code = '';
 
       var subjects = [];
@@ -261,24 +333,21 @@
       var pl = document.getElementById('profileLevel');
       if (pl) {
         pl.textContent =
-          (LEVEL_LABELS[level] || level || '—') +
-          (code ? ' · ' + code : '');
+          (LEVEL_LABELS[level] || level || '—') + (code ? ' · ' + code : '');
       }
 
-      if (typeof showToast === 'function') showToast('Wasifu wa masomo umehifadhiwa.');
+      if (typeof showToast === 'function') showToast('Study profile saved.');
       try {
         refreshSuggestedTopics();
       } catch (e) {}
     });
   }
 
-  /* ── Register form: remove university + show tahasusi on form5/6 ── */
   function enhanceRegisterForm() {
     var reg = document.getElementById('regLevel');
     cleanLevelSelect(reg);
     if (!reg) return;
 
-    // Insert tahasusi under regLevel if missing
     if (!document.getElementById('regTahasusiWrap')) {
       var field = reg.closest('.field');
       if (field && field.parentNode) {
@@ -287,8 +356,8 @@
         wrap.id = 'regTahasusiWrap';
         wrap.style.display = 'none';
         wrap.innerHTML =
-          '<label>Tahasusi (Form 5–6)</label>' +
-          '<select id="regTahasusi"><option value="">Chagua tahasusi...</option></select>';
+          '<label>What is your Combination? <span style="color:var(--cyan);font-weight:500">(optional)</span></label>' +
+          '<select id="regTahasusi"><option value="">Optional — skip if unsure</option></select>';
         field.parentNode.insertBefore(wrap, field.nextSibling);
 
         loadCombinations().then(function () {
@@ -302,7 +371,6 @@
       }
     }
 
-    // Patch handleRegister extras after submit — monkey via submit button path
     var origRegister = window.handleRegister;
     if (typeof origRegister === 'function' && !origRegister._tahPatched) {
       window.handleRegister = function () {
@@ -327,7 +395,6 @@
     }
   }
 
-  /* ── Inject profile into chat API bodies ── */
   function interceptChatFetch() {
     if (typeof window.fetch !== 'function') return;
     var orig = window.fetch.bind(window);
@@ -357,11 +424,13 @@
     };
   }
 
-  /* ── Suggested topics (relabel + filter) ── */
   function relabelTrending() {
     document.querySelectorAll('.trending-label').forEach(function (el) {
       if (el.textContent && /trending/i.test(el.textContent)) {
-        el.innerHTML = el.innerHTML.replace(/Today's Trending Topics|Trending Topics/i, 'Suggested Topics');
+        el.innerHTML = el.innerHTML.replace(
+          /Today's Trending Topics|Trending Topics/i,
+          'Suggested Topics'
+        );
       }
     });
   }
@@ -380,9 +449,11 @@
     var p = getProfilePayload();
     var allowed = p.preferredSubjects || [];
     if (!allowed.length) return;
-
-    // Filter currently rendered cards if possible
-    if (typeof trendingCardsData !== 'undefined' && Array.isArray(trendingCardsData) && trendingCardsData.length) {
+    if (
+      typeof trendingCardsData !== 'undefined' &&
+      Array.isArray(trendingCardsData) &&
+      trendingCardsData.length
+    ) {
       var filtered = trendingCardsData.filter(function (c) {
         return subjectMatch(c.subject, allowed);
       });
@@ -392,7 +463,6 @@
     }
   }
 
-  // Patch renderTrendingCards to filter + relabel
   function patchTrendingRenderer() {
     if (typeof renderTrendingCards !== 'function' || renderTrendingCards._tahPatched) return;
     var orig = renderTrendingCards;
@@ -424,7 +494,6 @@
     } catch (e) {}
   }
 
-  // Patch updateProfileView to rebuild study box
   function patchUpdateProfileView() {
     if (typeof updateProfileView !== 'function' || updateProfileView._tahPatched) return;
     var orig = updateProfileView;
@@ -448,7 +517,6 @@
     relabelTrending();
     enhanceProfileLevelDisplay();
 
-    // Retry patches if main script defines functions later
     var n = 0;
     var t = setInterval(function () {
       n++;
