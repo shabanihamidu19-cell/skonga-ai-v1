@@ -7,7 +7,8 @@
  * Also loads:
  *  - skonga-ux-hooks.js (Pro expiry reminder, limit→Pro, AI notify)
  *  - skonga-visuals.js  (web search images / diagrams in chat)
- *  - skonga-profile-tahasusi.js (Form 1–6 + A-Level tahasusi)
+ *  - skonga-profile-tahasusi.js (Form 1–6 + A-Level combination)
+ *  - skonga-pro-onboard.js (Pro Active-until + first-run onboarding)
  */
 (function () {
   var VERSION_URL =
@@ -140,4 +141,5 @@
   loadScript('./skonga-ux-hooks.js');
   loadScript('./skonga-visuals.js');
   loadScript('./skonga-profile-tahasusi.js');
+  loadScript('./skonga-pro-onboard.js');
 })();
