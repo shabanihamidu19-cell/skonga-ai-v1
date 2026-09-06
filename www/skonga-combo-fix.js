@@ -6,6 +6,7 @@
 
     function paintGrid(container) {
       if (!container) return;
+      if (container.getAttribute('data-combo-ready') === '1') return;
       var groups = {};
       list.forEach(function (c) {
         var cat = c.categoryNameEn || c.categoryNameSw || 'Other';
@@ -29,6 +30,7 @@
         html += '</div>';
       });
       container.innerHTML = html;
+      container.setAttribute('data-combo-ready', '1');
       container.querySelectorAll('.ob-cell').forEach(function (btn) {
         btn.addEventListener('click', function () {
           container.querySelectorAll('.ob-cell').forEach(function (b) {
@@ -43,11 +45,12 @@
             tag.innerHTML =
               '<strong>' + found.code + '</strong> — ' + (found.subjects || []).join(', ');
           }
+          window.__skongaSelectedCombo = code;
           try {
-            window.__skongaSelectedCombo = code;
-            // Sync with onboard selectedCombo if same page
-            var levelBtn = document.querySelector('#obLevelGrid .ob-cell.selected');
-            // Store into extras on Continue is handled by onboard; also patch save
+            var extras = JSON.parse(localStorage.getItem('skonga_user_extras') || '{}') || {};
+            extras.combinationCode = code;
+            extras.preferredSubjects = found ? found.subjects || [] : [];
+            localStorage.setItem('skonga_user_extras', JSON.stringify(extras));
           } catch (e) {}
         });
       });
@@ -55,7 +58,7 @@
 
     function fillSelect(sel) {
       if (!sel || !sel.options) return;
-      if (sel.options.length > 2) return; // already filled
+      if (sel.options.length > 2) return;
       var groups = {};
       list.forEach(function (c) {
         var cat = c.categoryNameEn || 'Other';
@@ -82,8 +85,14 @@
 
     function tryPaint() {
       var grid = document.getElementById('obComboGrid');
-      if (grid && /Loading/i.test(grid.textContent || '')) {
-        paintGrid(grid);
+      if (grid) {
+        var txt = grid.textContent || '';
+        if (/Loading/i.test(txt) || grid.getAttribute('data-combo-ready') !== '1') {
+          if (/Loading/i.test(txt) || !grid.querySelector('.ob-cell')) {
+            grid.removeAttribute('data-combo-ready');
+            paintGrid(grid);
+          }
+        }
       }
       fillSelect(document.getElementById('regTahasusi'));
       fillSelect(document.getElementById('studyTahasusiSelect'));
