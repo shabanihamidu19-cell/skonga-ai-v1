@@ -1,14 +1,12 @@
 /* SKONGA AI — APK / web update checker (VidMate-style)
  * Include before </body>: <script src="./update-check.js"></script>
  *
- * On launch, fetches version.json from GitHub. If remote version is newer
- * than APP_VERSION, shows a dialog and opens the APK download URL.
- *
  * Also loads:
- *  - skonga-ux-hooks.js (Pro expiry reminder, limit→Pro, AI notify)
- *  - skonga-visuals.js  (web search images / diagrams in chat)
- *  - skonga-profile-tahasusi.js (Form 1–6 + A-Level combination)
- *  - skonga-pro-onboard.js (Pro Active-until + first-run onboarding)
+ *  - tahasusi-fallback.js (offline A-Level combinations — never stuck Loading)
+ *  - skonga-ux-hooks.js
+ *  - skonga-visuals.js
+ *  - skonga-profile-tahasusi.js
+ *  - skonga-pro-onboard.js
  */
 (function () {
   var VERSION_URL =
@@ -107,10 +105,7 @@
       if (!res.ok) return;
       var remote = await res.json();
       if (!remote || !remote.version) return;
-
-      if (cmpVersion(remote.version, local) > 0) {
-        showUpdateUI(remote);
-      }
+      if (cmpVersion(remote.version, local) > 0) showUpdateUI(remote);
     } catch (e) {}
   }
 
@@ -138,6 +133,8 @@
     } catch (e) {}
   }
 
+  // Offline combinations first (so onboarding never stuck on Loading…)
+  loadScript('./tahasusi-fallback.js');
   loadScript('./skonga-ux-hooks.js');
   loadScript('./skonga-visuals.js');
   loadScript('./skonga-profile-tahasusi.js');
