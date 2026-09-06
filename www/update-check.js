@@ -2,11 +2,12 @@
  * Include before </body>: <script src="./update-check.js"></script>
  *
  * Also loads:
- *  - tahasusi-fallback.js (offline A-Level combinations — never stuck Loading)
+ *  - tahasusi-fallback.js (86 combinations offline)
  *  - skonga-ux-hooks.js
  *  - skonga-visuals.js
  *  - skonga-profile-tahasusi.js
  *  - skonga-pro-onboard.js
+ *  - skonga-combo-fix.js (fills grid if stuck Loading)
  */
 (function () {
   var VERSION_URL =
@@ -133,10 +134,10 @@
     } catch (e) {}
   }
 
-  // Offline combinations first (so onboarding never stuck on Loading…)
   loadScript('./tahasusi-fallback.js');
   loadScript('./skonga-ux-hooks.js');
   loadScript('./skonga-visuals.js');
   loadScript('./skonga-profile-tahasusi.js');
   loadScript('./skonga-pro-onboard.js');
+  loadScript('./skonga-combo-fix.js');
 })();
