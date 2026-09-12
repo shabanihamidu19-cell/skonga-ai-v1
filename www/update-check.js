@@ -2,6 +2,7 @@
  * Include before </body>: <script src="./update-check.js"></script>
  *
  * Also loads:
+ *  - skonga-usage-identity.js (userId / X-Skonga-User-Id on AI + pay)
  *  - tahasusi-fallback.js (86 combinations offline)
  *  - skonga-ux-hooks.js
  *  - skonga-visuals.js
@@ -134,6 +135,8 @@
     } catch (e) {}
   }
 
+  // P0: identity for analytics / quotas (must load before user sends AI traffic)
+  loadScript('./skonga-usage-identity.js');
   loadScript('./tahasusi-fallback.js');
   loadScript('./skonga-ux-hooks.js');
   loadScript('./skonga-visuals.js');
