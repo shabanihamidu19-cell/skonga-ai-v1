@@ -1,25 +1,20 @@
-# SKONGA AI
+**SKONGA AI** is a study assistant for Tanzanian secondary students (Form 1–6).
 
-Tanzanian student AI assistant — Capacitor Android shell + web UI, soft free limits, **mobile-money payments** (M-Pesa, Tigo, Airtel, Halo).
+Ask questions in chat, set your **form** and (for Form 5–6) **subject combination** (e.g. HGE, PCM), and get answers matched to your level. Soft free limits; **Pro** unlocks via mobile money (M-Pesa, Tigo, Airtel, Halo) through ClickPesa.
 
 **Owner:** KCL Platform TZ · **Repo:** [skonga-ai-v1](https://github.com/shabanihamidu19-cell/skonga-ai-v1)
 
 ---
 
-## Status (August 2026)
+## Status (September 2026)
 
 | Layer | State | Notes |
 |--------|--------|--------|
-| **Frontend (www)** | ~95% | English UI, Pro header, in-app pay sheet, Settings/Profile, theme, preferred name |
-| **Legal pages** | Ready to host | `legal/` — Terms + Privacy (EN + SW). Deploy separately; app opens in browser |
-| **Capacitor / APK** | CI builds debug | `.github/workflows/build-android.yml` → artifact `skonga-ai-debug-apk` |
-| **Firebase config** | Template only | `android-config/google-services.json` — replace with real project values |
-| **Backend / API** | **Not built** | Chat, STK Push, Pro entitlements, auth still client/local or mock |
-| **Release signing** | Optional | Needs GitHub Secrets for signed release APK |
-
-**Remaining to production:** backend + real STK + real AI API + legal deploy + signed APK + store listing.
-
----
+| **Frontend (www)** | Live | Form + Combination onboarding, Pro UI, ClickPesa pay flow |
+| **Backend** | Live | `skonga-backend-v2` — chat, payments, tahasusi, Pro status |
+| **APK** | Release pipeline | Signed release APK via GitHub Actions (not debug) |
+| **Distribution** | Sideload | GitHub Releases → `SKONGA-AI-release.apk` |
+| **Play Protect** | Release-signed | Debug APK no longer published to users |
 
 ## What's in the app today
 
@@ -175,6 +170,14 @@ Use this as the live work queue. Check off as you go.
 - [ ] Generate final icons/splash from `resources/` in CI (already attempted in workflow)
 - [ ] Remove offline false-positives if any (banner when online)
 - [ ] Smoke-test: New Chat, Settings theme, preferred name, Clear History, Pro flow UI
+
+## Download (testers)
+
+Latest release:  
+https://github.com/shabanihamidu19-cell/skonga-ai-v1/releases
+
+Install: open the `.apk` on Android → allow install from this source.  
+If Play Protect shows a first-time warning on a new signing key, use **More details → Install anyway**.
 
 ### B. Legal & trust
 
