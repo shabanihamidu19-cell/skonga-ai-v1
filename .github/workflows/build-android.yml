@@ -1,7 +1,5 @@
 name: Build Android APK
 
-# Runs automatically every time you push code to the "main" branch.
-# You can also trigger it manually from the GitHub Actions tab (workflow_dispatch).
 on:
   push:
     branches: [main]
@@ -21,7 +19,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Set up Java (needed by Gradle/Android build)
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -37,8 +35,6 @@ jobs:
         run: npx cap add android
 
       - name: Generate app icon + splash (if resources/ present)
-        # @capacitor/assets is not in package.json (sharp breaks on Termux).
-        # Skip gracefully if resources/ is missing so the build still succeeds.
         run: |
           if [ -d resources ]; then
             npx --yes @capacitor/assets generate --android || true
@@ -46,40 +42,44 @@ jobs:
             echo "No resources/ folder — using default Capacitor icons"
           fi
 
-      - name: Sync Capacitor (copies www/ into the native Android project)
+      - name: Sync Capacitor
         run: npx cap sync android
+
+      - name: Harden release AndroidManifest (allowBackup=false)
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MANIFEST" ]; then
+            # Force allowBackup off for public distribution
+            sed -i 's/android:allowBackup="true"/android:allowBackup="false"/g' "$MANIFEST"
+            # Ensure debuggable is not forced true in the template
+            sed -i 's/android:debuggable="true"//g' "$MANIFEST"
+            echo "Manifest hardened:"
+            grep -E 'allowBackup|debuggable|package=' "$MANIFEST" || true
+          fi
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
-      - name: Build debug APK
-        working-directory: android
-        run: ./gradlew assembleDebug
-
-      - name: Upload APK as a downloadable artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: skonga-ai-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-
-      # ── SIGNED RELEASE BUILD (optional) ───────────────────────────
-      # Add these 4 secrets in repo Settings ▸ Secrets ▸ Actions:
-      #   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD,
-      #   ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
       - name: Check for release signing secrets
         id: has-signing
         run: |
-          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ] && \
+             [ -n "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" ] && \
+             [ -n "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then
             echo "present=true" >> "$GITHUB_OUTPUT"
+            echo "Release signing secrets found."
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Missing ANDROID_KEYSTORE_* secrets — cannot ship production APK."
           fi
 
       - name: Decode release keystore
         if: steps.has-signing.outputs.present == 'true'
-        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$GITHUB_WORKSPACE/android/app/release.keystore"
+          ls -la "$GITHUB_WORKSPACE/android/app/release.keystore"
 
-      - name: Build signed release APK
+      - name: Build signed RELEASE APK (production)
         if: steps.has-signing.outputs.present == 'true'
         working-directory: android
         env:
@@ -87,32 +87,74 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
+          # Prefer KEY_PASSWORD; fall back to store password
+          KP="${ANDROID_KEY_PASSWORD:-$ANDROID_KEYSTORE_PASSWORD}"
           ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=release.keystore \
+            -Pandroid.injected.signing.store.file="$GITHUB_WORKSPACE/android/app/release.keystore" \
             -Pandroid.injected.signing.store.password="$ANDROID_KEYSTORE_PASSWORD" \
             -Pandroid.injected.signing.key.alias="$ANDROID_KEY_ALIAS" \
-            -Pandroid.injected.signing.key.password="$ANDROID_KEY_PASSWORD"
+            -Pandroid.injected.signing.key.password="$KP"
+          ls -la app/build/outputs/apk/release/
 
-      - name: Upload signed release APK
+      - name: Rename release APK for distribution
+        if: steps.has-signing.outputs.present == 'true'
+        run: |
+          SRC="android/app/build/outputs/apk/release/app-release.apk"
+          if [ ! -f "$SRC" ]; then
+            # Some AGP versions name it app-release-unsigned if signing failed
+            SRC=$(find android/app/build/outputs/apk/release -name '*.apk' | head -1)
+          fi
+          cp "$SRC" "android/app/build/outputs/apk/release/SKONGA-AI-release.apk"
+          ls -la android/app/build/outputs/apk/release/
+
+      - name: Upload release APK artifact
         if: steps.has-signing.outputs.present == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: skonga-ai-release-apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: android/app/build/outputs/apk/release/SKONGA-AI-release.apk
 
-      # ── Publish .apk to GitHub Release (direct download, not zip) ──
-      - name: Publish APK to GitHub Release
+      - name: Build debug APK (internal only — not published)
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Upload debug APK artifact (testers/dev only)
+        uses: actions/upload-artifact@v4
+        with:
+          name: skonga-ai-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish RELEASE APK to GitHub Release
+        if: steps.has-signing.outputs.present == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
           name: SKONGA AI build ${{ github.run_number }}
           body: |
-            Auto-built from main.
-            Install the .apk (allow install from unknown sources).
+            **Production release APK** (signed, non-debuggable).
+
+            Package: `tz.co.kclplatform.skonga`
+
+            Install: download `SKONGA-AI-release.apk` → open on phone → allow install.
+
+            If Play Protect shows a one-time scan warning on a brand-new signing key, choose **More details → Install anyway** after the first installs; it usually calms down once Google has seen the APK.
           files: |
-            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/apk/release/SKONGA-AI-release.apk
           draft: false
           prerelease: false
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fail clearly if no release signing (no more public debug APKs)
+        if: steps.has-signing.outputs.present != 'true'
+        run: |
+          echo "============================================================"
+          echo "BLOCKED: Refusing to publish app-debug.apk to users."
+          echo "Add these repository secrets, then re-run this workflow:"
+          echo "  ANDROID_KEYSTORE_BASE64"
+          echo "  ANDROID_KEYSTORE_PASSWORD"
+          echo "  ANDROID_KEY_ALIAS"
+          echo "  ANDROID_KEY_PASSWORD  (same as store password is OK)"
+          echo "============================================================"
+          exit 1
