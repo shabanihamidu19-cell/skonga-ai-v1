@@ -54,6 +54,13 @@ img{ -webkit-touch-callout:none; pointer-events:auto; }
 
 /* ── APP ── */
 #app{width:100%;max-width:430px;height:100svh;display:flex;flex-direction:column;background:var(--bg-primary);position:relative;overflow:hidden}
+/* Desktop / tablet: Gemini-like readable width */
+@media (min-width:600px){
+  #app{max-width:48rem; /* 768px */ border-left:1px solid var(--border);border-right:1px solid var(--border);box-shadow:0 0 40px rgba(0,0,0,.35)}
+  #chat-area{padding:24px 28px 16px}
+  .input-zone{padding:12px 28px 10px}
+  .msg-row.bot .bubble{padding:2px 8px 14px 0}
+}
 
 /* ── HEADER ── */
 header{height:var(--hdr-h);display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:var(--bg-secondary);border-bottom:1px solid var(--border);position:relative;z-index:20;flex-shrink:0}
@@ -268,8 +275,18 @@ nav{height:var(--nav-h);background:var(--bg-secondary);border-top:1px solid var(
 
 /* ── STREAMING BUBBLE ── */
 .streaming-bubble{position:relative}
-.ai-cursor{display:inline-block;width:2px;height:1.1em;background:var(--purple-light);margin-left:2px;vertical-align:text-bottom;border-radius:1px;animation:cursorBlink .8s step-end infinite}
+.ai-cursor{display:inline-block;width:2.5px;height:1.15em;background:var(--purple-light);margin-left:3px;vertical-align:text-bottom;border-radius:1px;animation:cursorBlink .7s step-end infinite;box-shadow:0 0 8px rgba(168,85,247,.55)}
 .ai-cursor.hidden{display:none}
+.listen-btn.playing{color:var(--purple-light)!important;border-color:var(--purple-main)!important;background:rgba(124,58,237,.2)!important}
+.listen-btn.playing svg{animation:pulseListen 1s ease-in-out infinite}
+@keyframes pulseListen{0%,100%{opacity:1}50%{opacity:.45}}
+.study-quick-bar{display:flex;flex-wrap:wrap;gap:6px;padding:0 0 8px}
+.study-chip{font-size:.72rem;padding:6px 10px;border-radius:16px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-family:var(--font-b)}
+.study-chip:hover{border-color:var(--purple-main);color:var(--purple-light)}
+/* While streaming, keep markdown readable */
+.streaming-bubble .md-content{display:inline}
+.streaming-bubble .md-content p{display:inline;margin:0}
+.streaming-bubble .md-content p + p{display:block;margin-top:6px}
 
 /* ── COPY BUTTON ── */
 .bubble-actions{position:absolute;top:-14px;right:4px;display:flex;gap:4px;opacity:0;transition:opacity .2s;pointer-events:none}
@@ -2438,19 +2455,135 @@ function copyBubble(bubble, btn){
 /* ── BUBBLE ACTION BAR: Copy | Save as Note | Share | Feedback ── */
 function buildBubbleActionsHtml(){
   return `
+    <button class="copy-btn listen-btn" title="Listen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
     <button class="copy-btn regen-btn" title="Regenerate answer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.95"/></svg></button>
     <button class="copy-btn copy-only-btn" title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy</button>
     <button class="copy-btn save-note-btn" title="Save as Note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Notes</button>
+    <button class="copy-btn flash-btn" title="Generate Flashcards"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><path d="M12 4v16"/></svg></button>
+    <button class="copy-btn quiz-btn" title="Create Practice Quiz"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
     <button class="copy-btn fb-btn fb-up" title="Good reply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg></button>
     <button class="copy-btn fb-btn fb-down" title="Incorrect reply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/></svg></button>`;
 }
 
 function bindBubbleActions(actions, bubble){
+  const listenBtn = actions.querySelector('.listen-btn');
+  if (listenBtn) listenBtn.addEventListener('click', e=>{ e.stopPropagation(); listenToBubble(bubble, listenBtn); });
   actions.querySelector('.regen-btn').addEventListener('click', e=>{ e.stopPropagation(); regenerateAnswer(bubble, actions.querySelector('.regen-btn')); });
   actions.querySelector('.copy-only-btn').addEventListener('click', e=>{ e.stopPropagation(); copyBubble(bubble, actions.querySelector('.copy-only-btn')); });
   actions.querySelector('.save-note-btn').addEventListener('click', e=>{ e.stopPropagation(); saveMessageAsNote(bubble); });
+  const flashBtn = actions.querySelector('.flash-btn');
+  if (flashBtn) flashBtn.addEventListener('click', e=>{ e.stopPropagation(); studyActionFromBubble(bubble, 'flashcards'); });
+  const quizBtn = actions.querySelector('.quiz-btn');
+  if (quizBtn) quizBtn.addEventListener('click', e=>{ e.stopPropagation(); studyActionFromBubble(bubble, 'quiz'); });
   actions.querySelector('.fb-up').addEventListener('click', e=>{ e.stopPropagation(); sendFeedback(bubble, actions, 'up'); });
   actions.querySelector('.fb-down').addEventListener('click', e=>{ e.stopPropagation(); sendFeedback(bubble, actions, 'down'); });
+}
+
+/* ── LISTEN (TTS) ── */
+let _ttsAudio = null;
+let _ttsSpeaking = false;
+
+function getBubblePlainText(bubble){
+  const contentEl = bubble.querySelector('.md-content') || bubble;
+  return (contentEl.innerText || contentEl.textContent || '').trim();
+}
+
+async function listenToBubble(bubble, btn){
+  const text = getBubblePlainText(bubble);
+  if(!text){ showToast('No text to read.', true); return; }
+
+  // Toggle stop if already playing this / any
+  if(_ttsSpeaking){
+    stopTtsPlayback();
+    if(btn) btn.classList.remove('playing');
+    return;
+  }
+
+  if(btn) btn.classList.add('playing');
+  _ttsSpeaking = true;
+
+  try{
+    // Try backend TTS first
+    const res = await fetch(`${API_BASE}/api/tts`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        text: text.slice(0, 4000),
+        lang: (appSettings.lang || 'sw').startsWith('sw') ? 'sw-TZ' : 'en-US',
+      }),
+    });
+
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    if(ct.includes('audio')){
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      if(_ttsAudio){ try{ _ttsAudio.pause(); }catch(_){} }
+      _ttsAudio = new Audio(url);
+      _ttsAudio.onended = ()=>{ _ttsSpeaking=false; if(btn) btn.classList.remove('playing'); URL.revokeObjectURL(url); };
+      _ttsAudio.onerror = ()=>{ _ttsSpeaking=false; if(btn) btn.classList.remove('playing'); };
+      await _ttsAudio.play();
+      return;
+    }
+
+    // JSON fallback → browser speechSynthesis
+    let data = {};
+    try{ data = await res.json(); }catch(_){}
+    speakWithBrowser(text, data.lang || ((appSettings.lang||'sw').startsWith('sw')?'sw-TZ':'en-US'), btn);
+  }catch(err){
+    console.warn('[TTS]', err);
+    speakWithBrowser(text, (appSettings.lang||'sw').startsWith('sw')?'sw-TZ':'en-US', btn);
+  }
+}
+
+function speakWithBrowser(text, lang, btn){
+  if(!window.speechSynthesis){
+    showToast('Speech not supported on this device.', true);
+    _ttsSpeaking=false;
+    if(btn) btn.classList.remove('playing');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.slice(0, 4000));
+  u.lang = lang || 'sw-TZ';
+  u.rate = 0.95;
+  u.onend = ()=>{ _ttsSpeaking=false; if(btn) btn.classList.remove('playing'); };
+  u.onerror = ()=>{ _ttsSpeaking=false; if(btn) btn.classList.remove('playing'); };
+  window.speechSynthesis.speak(u);
+}
+
+function stopTtsPlayback(){
+  _ttsSpeaking = false;
+  if(_ttsAudio){ try{ _ttsAudio.pause(); _ttsAudio.currentTime=0; }catch(_){} }
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  document.querySelectorAll('.listen-btn.playing').forEach(b=>b.classList.remove('playing'));
+}
+
+/* ── STUDY ACTIONS: Flashcards / Quiz from a reply ── */
+function studyActionFromBubble(bubble, kind){
+  const text = getBubblePlainText(bubble);
+  if(!text || text.length < 40){
+    showToast('Reply is too short — ask a fuller question first.', true);
+    return;
+  }
+  const snippet = text.slice(0, 1200);
+  let prompt = '';
+  if(kind === 'flashcards'){
+    prompt = `Create 6–10 clear study flashcards from the notes below. Format each as:\n**Q:** question\n**A:** short answer\nUse simple language for a Tanzanian secondary student. Cover the key ideas only.\n\n---\n${snippet}`;
+  } else {
+    prompt = `Create a short practice quiz (5 multiple-choice questions) from the notes below. For each question show:\n1) the question\n2) options A–D\n3) the correct answer marked clearly\n4) a one-line explanation.\nKeep it suitable for Form 1–6 revision.\n\n---\n${snippet}`;
+  }
+  msgInput.value = prompt;
+  msgInput.style.height = 'auto';
+  msgInput.style.height = Math.min(msgInput.scrollHeight, 160) + 'px';
+  sendMessage();
+}
+
+/* ── STUDY PLANNER (quick prompt) ── */
+function openStudyPlannerPrompt(){
+  const today = new Date().toISOString().slice(0,10);
+  msgInput.value = `Help me make a study timetable. Today is ${today}. Ask me: (1) exam/subject dates, (2) hours I can study per day, (3) subjects I need most help with. Then give a clear daily plan with short sessions and breaks.`;
+  msgInput.focus();
+  showToast('Fill in your dates & hours, then send ✓');
 }
 
 /* ── SAVE BOT MESSAGE AS NOTE → jumps straight to the Notes page ── */
@@ -2795,6 +2928,88 @@ function askPracticeQuestion(btn, question) {
 }
 
 let stopStreaming = false;
+let activeStreamController = null; // AbortController for true SSE
+
+/**
+ * True SSE streaming from backend /api/chat/stream.
+ * Falls back to full JSON + client typewriter if stream fails.
+ * Returns { reply, citations, graph, practiceQ } or throws.
+ */
+async function streamFromBackend(payload, onToken) {
+  if (activeStreamController) {
+    try { activeStreamController.abort(); } catch (_) {}
+  }
+  activeStreamController = new AbortController();
+  const signal = activeStreamController.signal;
+
+  const res = await fetchWithColdStartHint(`${API_BASE}/api/chat/stream`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+    body: JSON.stringify(payload),
+    signal,
+  });
+
+  if (!res.ok) {
+    let errMsg = 'Tatizo la server limetokea';
+    try {
+      const errData = await res.json();
+      if (errData.code === 'QUOTA_EXCEEDED') {
+        errMsg = errData.error || 'Daily free limit reached. Upgrade to Pro.';
+        try { if (typeof openPaySheet === 'function') openPaySheet(); } catch (_) {}
+      } else if (errData.error) errMsg = errData.error;
+    } catch (_) {}
+    throw new Error(errMsg);
+  }
+
+  // If server didn't return SSE, fall back
+  const ct = (res.headers.get('content-type') || '').toLowerCase();
+  if (!ct.includes('text/event-stream') && !ct.includes('text/plain')) {
+    const data = await res.json();
+    if (!data.reply) throw new Error(data.error || 'Backend did not return a valid reply');
+    return data;
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let fullReply = '';
+  let meta = { citations: [], graph: null, practiceQ: null, providerUsed: null, error: null };
+
+  while (true) {
+    if (stopStreaming || signal.aborted) {
+      try { await reader.cancel(); } catch (_) {}
+      break;
+    }
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const parts = buffer.split('\n\n');
+    buffer = parts.pop() || '';
+    for (const part of parts) {
+      const line = part.trim();
+      if (!line.startsWith('data:')) continue;
+      const raw = line.slice(5).trim();
+      if (!raw || raw === '[DONE]') continue;
+      try {
+        const evt = JSON.parse(raw);
+        if (evt.token) {
+          fullReply += evt.token;
+          if (onToken) onToken(evt.token, fullReply);
+        }
+        if (evt.done) {
+          meta.citations = evt.citations || meta.citations;
+          meta.graph = evt.graph || meta.graph;
+          meta.practiceQ = evt.practiceQ || meta.practiceQ;
+          meta.providerUsed = evt.providerUsed || meta.providerUsed;
+          if (evt.error) meta.error = evt.error;
+        }
+      } catch (_) { /* ignore malformed chunks */ }
+    }
+  }
+
+  if (meta.error && !fullReply) throw new Error(meta.error);
+  return { reply: fullReply, ...meta };
+}
 
 function streamMessage(fullText, onDone, sources, graphData, practiceQ){
   hideTyping();
@@ -2836,9 +3051,12 @@ function streamMessage(fullText, onDone, sources, graphData, practiceQ){
   ca.appendChild(row);
   scrollBottom();
 
+  // Tokenize by words while preserving whitespace for natural typing rhythm
   const words=fullText.split(/(\s+)/);
   let revealed='';
   let idx=0;
+  let wordsSinceMd=0;
+  const MD_EVERY = 6; // re-render markdown every N words for progressive feel
 
   function finalizeBubble(wasStopped){
     contentEl.innerHTML=renderMarkdown(revealed);
@@ -2868,10 +3086,31 @@ function streamMessage(fullText, onDone, sources, graphData, practiceQ){
       return;
     }
     revealed+=words[idx++];
-    contentEl.textContent=revealed;
+    wordsSinceMd++;
+
+    const lastWord=words[idx-1] || '';
+    const isSentenceEnd = /[.!?]\s*$/.test(lastWord);
+    // Progressive Markdown: update on sentence end or every few words
+    if(isSentenceEnd || wordsSinceMd >= MD_EVERY || idx >= words.length){
+      contentEl.innerHTML = renderMarkdown(revealed);
+      // Keep cursor after content during stream
+      if(cursor.parentNode !== bubble) bubble.appendChild(cursor);
+      else bubble.appendChild(cursor); // ensure last
+      wordsSinceMd = 0;
+    } else {
+      // Fast path: plain text between markdown refreshes
+      const plain = contentEl.querySelector('.md-content') || contentEl;
+      if(plain.classList && plain.classList.contains('md-content')){
+        // append to last text node if possible, else full re-render next cycle
+        contentEl.innerHTML = renderMarkdown(revealed);
+        bubble.appendChild(cursor);
+      } else {
+        contentEl.textContent = revealed;
+      }
+    }
+
     scrollBottom(false);
-    const lastWord=words[idx-1];
-    const delay=lastWord.match(/[.!?]$/) ? 180 : (lastWord.trim()==='' ? 0 : 55+Math.random()*35);
+    const delay = isSentenceEnd ? 140 : (lastWord.trim()==='' ? 0 : 28 + Math.random()*22);
     setTimeout(typeNext, delay);
   }
   typeNext();
@@ -3431,6 +3670,10 @@ function setSendBtnToStop(isStop){
 function stopAiResponse(){
   userStoppedCurrentTurn = true;
   stopStreaming = true; // tazama streamMessage — inasimamisha word-by-word reveal
+  if (activeStreamController) {
+    try { activeStreamController.abort(); } catch (_) {}
+    activeStreamController = null;
+  }
   hideTyping();
   isAiResponding = false;
   setSendBtnToStop(false);
@@ -3585,48 +3828,134 @@ async function sendMessage(opts){
     return;
   }
 
-  // REAL AI — talks to the Node/Express backend, see API_BASE above
+  // REAL AI — prefer true SSE stream (/api/chat/stream), fall back to full JSON + typewriter
   // Curriculum RAG is fetched server-side (Library API); we only pass form/subject hints.
   try{
-    const res = await fetchWithColdStartHint(`${API_BASE}/api/chat`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        message: text,
-        lang: appSettings.lang,
-        style: appSettings.style,
-        userName: appSettings.userName,
-        identityQuestionCount,
-        history: conversationMemory.slice(0, -1),
-        sessionId: DEVICE_SESSION_ID,
-        notifyOnComplete: appSettings.notificationsEnabled && isNativeApp,
-        formHint: getStudentFormHint(),
-        // Usage quota: Firebase uid → AI backend → auth-content-service
-        userId: (window._fb && window._fb.currentUser && window._fb.currentUser.uid) || null,
-      })
-    });
+    const payload = {
+      message: text,
+      lang: appSettings.lang,
+      style: appSettings.style,
+      userName: appSettings.userName,
+      identityQuestionCount,
+      history: conversationMemory.slice(0, -1),
+      sessionId: DEVICE_SESSION_ID,
+      notifyOnComplete: appSettings.notificationsEnabled && isNativeApp,
+      formHint: getStudentFormHint(),
+      userId: (window._fb && window._fb.currentUser && window._fb.currentUser.uid) || null,
+    };
 
-    if(userStoppedCurrentTurn) return;
+    // Prepare live bubble for true token streaming
+    hideTyping();
+    const ca = $('chat-area');
+    const row = document.createElement('div');
+    row.className = 'msg-row bot';
+    row.style.cssText = 'animation:bubbleIn .35s ease both';
+    const icon = document.createElement('div');
+    icon.className = 'bot-icon';
+    icon.innerHTML = `<svg viewBox="0 0 50 50" fill="none"><circle cx="25" cy="25" r="20" stroke="#a855f7" stroke-width="2"/><path d="M15 25 Q20 15 25 25 Q30 35 35 25" stroke="#c084fc" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
+    row.appendChild(icon);
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble streaming-bubble';
+    const actions = document.createElement('div');
+    actions.className = 'bubble-actions';
+    actions.innerHTML = buildBubbleActionsHtml();
+    bindBubbleActions(actions, bubble);
+    bubble.appendChild(actions);
+    bubble.addEventListener('touchstart', () => bubble.classList.toggle('show-actions'), { passive: true });
+    const contentEl = document.createElement('div');
+    bubble.appendChild(contentEl);
+    const cursor = document.createElement('span');
+    cursor.className = 'ai-cursor';
+    bubble.appendChild(cursor);
+    const tsDiv = document.createElement('div');
+    tsDiv.className = 'ts';
+    tsDiv.style.visibility = 'hidden';
+    tsDiv.textContent = fmtTime();
+    bubble.appendChild(tsDiv);
+    row.appendChild(bubble);
+    ca.appendChild(row);
+    scrollBottom();
 
-    if(!res.ok){
-      let errMsg='Tatizo la server limetokea';
-      try{
-        const errData=await res.json();
-        if(errData.code==='QUOTA_EXCEEDED'){
-          errMsg=errData.error||'Daily free limit reached. Upgrade to Pro.';
-          try{ if(typeof openPaySheet==='function') openPaySheet(); }catch(_){}
-        } else if(errData.error) errMsg=errData.error;
-      }catch(_){}
-      throw new Error(errMsg);
+    let wordsSinceMd = 0;
+    const MD_EVERY = 8;
+    let lastRenderLen = 0;
+
+    const onToken = (token, fullSoFar) => {
+      if (stopStreaming || userStoppedCurrentTurn) return;
+      wordsSinceMd++;
+      const shouldRender = wordsSinceMd >= MD_EVERY || /[.!?\n]$/.test(token) || fullSoFar.length - lastRenderLen > 80;
+      if (shouldRender) {
+        contentEl.innerHTML = renderMarkdown(fullSoFar);
+        bubble.appendChild(cursor);
+        lastRenderLen = fullSoFar.length;
+        wordsSinceMd = 0;
+        scrollBottom(false);
+      } else {
+        // lightweight append
+        contentEl.innerHTML = renderMarkdown(fullSoFar);
+        bubble.appendChild(cursor);
+        scrollBottom(false);
+      }
+    };
+
+    let data;
+    try {
+      data = await streamFromBackend(payload, onToken);
+    } catch (streamErr) {
+      // Fallback: classic non-stream endpoint + client typewriter
+      if (userStoppedCurrentTurn) return;
+      row.remove();
+      const res = await fetchWithColdStartHint(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (userStoppedCurrentTurn) return;
+      if (!res.ok) {
+        let errMsg = 'Tatizo la server limetokea';
+        try {
+          const errData = await res.json();
+          if (errData.code === 'QUOTA_EXCEEDED') {
+            errMsg = errData.error || 'Daily free limit reached. Upgrade to Pro.';
+            try { if (typeof openPaySheet === 'function') openPaySheet(); } catch (_) {}
+          } else if (errData.error) errMsg = errData.error;
+        } catch (_) {}
+        throw new Error(errMsg);
+      }
+      data = await res.json();
+      if (!data.reply) throw new Error(data.error || 'Backend did not return a valid reply');
+      // Use existing typewriter path
+      const citeSourcesFb = (data.citations || []).map(c => ({
+        title: c.title_sw || c.title_en || c.title || c.topic_id,
+        title_en: c.title_en || c.title,
+        title_sw: c.title_sw || c.title,
+        url: (c.url && c.url !== '#') ? c.url : '',
+        domain: 'SKONGA Library',
+        kind: 'curriculum',
+        subject_name: c.subject_name || c.subject || '',
+        form_id: c.form_id || c.form || '',
+        difficulty: c.difficulty || '',
+        topic_id: c.topic_id || '',
+      }));
+      streamMessage(data.reply, () => { saveCurrentSession(); finishAiTurn(); }, citeSourcesFb, data.graph || null, data.practiceQ || null);
+      return;
     }
 
-    const data = await res.json();
-    if(userStoppedCurrentTurn) return;
-    if(!data.reply) throw new Error('Backend did not return a valid reply');
+    if (userStoppedCurrentTurn) {
+      contentEl.innerHTML = renderMarkdown(data.reply || contentEl.textContent || '');
+      contentEl.insertAdjacentHTML('beforeend', `<div class="stopped-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>You stopped this reply</div>`);
+      cursor.remove();
+      tsDiv.style.visibility = 'visible';
+      bubble.classList.remove('streaming-bubble');
+      finishAiTurn();
+      return;
+    }
 
-    pushMemory('assistant', data.reply);
-    showLocalNotificationIfHidden(data.reply);
-    const citeSources = (data.citations||[]).map(c => ({
+    if (!data.reply) throw new Error(data.error || 'Backend did not return a valid reply');
+
+    // Final polish
+    contentEl.innerHTML = renderMarkdown(data.reply);
+    const citeSources = (data.citations || []).map(c => ({
       title: c.title_sw || c.title_en || c.title || c.topic_id,
       title_en: c.title_en || c.title,
       title_sw: c.title_sw || c.title,
@@ -3636,14 +3965,23 @@ async function sendMessage(opts){
       subject_name: c.subject_name || c.subject || '',
       form_id: c.form_id || c.form || '',
       difficulty: c.difficulty || '',
-      topic_id: c.topic_id || ''
+      topic_id: c.topic_id || '',
     }));
-    streamMessage(data.reply, ()=>{ saveCurrentSession(); finishAiTurn(); }, citeSources, data.graph || null, data.practiceQ || null);
+    if (citeSources.length) contentEl.insertAdjacentHTML('beforeend', buildSourcesHtml(citeSources));
+    if (data.graph) buildGraphBubble(data.graph, data.practiceQ || null, contentEl);
+    cursor.remove();
+    tsDiv.style.visibility = 'visible';
+    bubble.classList.remove('streaming-bubble');
+    pushMemory('assistant', data.reply);
+    showLocalNotificationIfHidden(data.reply);
+    saveCurrentSession();
+    finishAiTurn();
+    scrollBottom();
 
-  }catch(err){
+  } catch (err) {
     finishAiTurn();
     hideTyping();
-    if(userStoppedCurrentTurn) return;
+    if (userStoppedCurrentTurn) return;
     routeError(err, text);
   }
 }
